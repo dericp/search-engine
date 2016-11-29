@@ -1,10 +1,7 @@
+package edu.washington.cs.dericp
 
-
-import edu.washington.cs.dericp.LanguageModel
-import junit.framework.TestCase
 import org.junit.Assert._
 import org.junit.Test
-import org.junit.Before
 
 class LanguageModelTest {
 
