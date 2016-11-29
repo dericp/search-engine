@@ -5,15 +5,8 @@ import scala.math.log
 /**
   * Created by Isa on 11/27/2016.
   */
-class LanguageModel {
+class LanguageModel(val index: Map[String,List[(Int,Int)]], val docLength: Map[Int,Int]) {
   // currently a unigram model
-
-  // test variables, should reflect entire corpus in final version
-  val index : Map[String,List[(Int,Int)]] = Map("the" -> List((0, 2), (1, 3), (2, 1)),
-    "big" -> List((0, 1), (2, 1)), "red" -> List((1, 1)), "house" -> List((1, 1), (2, 1)),
-    "is" -> List((0, 1), (1, 1), (2, 1))) //null
-  val docLength : Map[Int,Int] = Map(0 -> 4, 1 -> 6, 2 -> 4) //null
-
 
   // find P(w)
   def findPW(word: String) : Double = {

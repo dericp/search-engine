@@ -22,6 +22,7 @@ object Main {
     val a = postings(docs).groupBy(_._1).mapValues(_.map(p => p._2).distinct.sorted)
 
     //---------------------
+    // i wrote language model based on having an inverted index w/ term frequency
 //
 //    def tfTuples (docs: Stream[Document]) : Stream[TfTuple] =
 //      docs.flatMap( d => d.tokens.groupBy(identity)
@@ -37,15 +38,6 @@ object Main {
 
     val a = docs
 
-
-    // TESTING LANGUAGE MODEL
-    val lm = new LanguageModel
-    val query = List("house", "is", "red")
-    val lambda = .01
-    println("0 -> " + lm.findLogPQDSmooth(query, 0, lambda).toString)
-    println("1 -> " + lm.findLogPQDSmooth(query, 1, lambda).toString)
-    println("2 -> " + lm.findLogPQDSmooth(query, 2, lambda).toString)
-    // DONE TESTING
   }
 
 }
