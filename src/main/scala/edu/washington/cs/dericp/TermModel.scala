@@ -15,9 +15,8 @@ class TermModel(val index: Map[String,List[(Int,Int)]], val docLength: Map[Int,I
   // Using simple scoring - sum of tf-idf scores of each query word, log of tf
   def tfIdfScore(query: List[String], docID: Int): Double = {
     val ltf = query.map( term => term -> Math.log(1 + index(term).find(_._1 == docID).getOrElse((0, 0))._2)).toMap
-    // TODO: convert to flatmap
     ltf.map{ case(term, ltf) => ltf * idf.getOrElse(term, 0.0) }.sum
   }
 
-  // Convert to use vector-based model and more complex scoring?
+  // TODO: Convert to use vector-based model and more complex scoring?
 }
