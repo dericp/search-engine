@@ -18,5 +18,6 @@ object Utils {
 
   // TODO: Decide if this should be implemented.  Seems easier / more
   // TODO: efficient to compute while finding query results
-  def avgPrec(): Unit = {}
+  // TODO: (!!) REMEMBER TO BOUND THE DENOMINATOR MIN( (TP + FN), 100)
+  // def avgPrec(): Unit = {}
 }

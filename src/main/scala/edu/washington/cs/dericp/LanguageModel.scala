@@ -1,5 +1,7 @@
 package edu.washington.cs.dericp
 
+import breeze.util.TopK
+
 import scala.math.log
 
 /**
@@ -33,5 +35,11 @@ class LanguageModel(val index: Map[String,List[(Int,Int)]], val docLength: Map[I
     val dqIntersection = query.filter(w => !index.getOrElse(w, List.empty).filter(a => a._1 == doc).isEmpty)
     val termProbs = dqIntersection.map(w => log(1 + ((1 - lambda) / lambda) * (findPWD(w, doc) / findPW(w)))).sum
     termProbs + log(lambda)
+  }
+
+  // TODO:  Write method to return top 100 docs by logpqd
+  def top100Docs(query: String): TopK[Int] = {
+    // consider using TopK from breeze to keep top 100
+    val result = new TopK[Int](100)
   }
 }
