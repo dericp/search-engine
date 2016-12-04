@@ -1,14 +1,18 @@
-import ch.ethz.dal.tinyir.indexing.Result
+package edu.washington.cs.dericp
+import ch.ethz.dal.tinyir.processing.XMLDocument
 
 /**
   * Created by dericp on 11/29/16.
   */
+class InvertedIndex(val docs : Stream[XMLDocument]) {
 
-class InvertedIndex {
+  def invertedIndex : Map[String, List[DocData]] = {
+    docs.flatMap(doc => doc.tokens.map( token => ( token, new DocData((doc.ID, 1)) ) ).groupBy(_._1).mapValues(_.map(t => t._2).distinct.sorted.toList)).toMap
+  }
 
   // if l1.length << l2.length, -> O(l1.length * log(l2.length))
   // TODO: (?) ^ add test for if length is much smaller, implement binary search
-  def intersect [A <% Result[A]] (l1: List[A], l2: List[A]) : List[A] = {
+  /*def intersect [A <% Result[A]] (l1: List[A], l2: List[A]) : List[A] = {
     var result = List[A]()
     val len1 = l1.length
     val len2 = l2.length
@@ -28,5 +32,6 @@ class InvertedIndex {
       }
     }
     result
-  }
+  }*/
 }
+
