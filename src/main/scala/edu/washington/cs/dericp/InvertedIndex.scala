@@ -6,9 +6,17 @@ import ch.ethz.dal.tinyir.processing.XMLDocument
   */
 class InvertedIndex(val docs : Stream[XMLDocument]) {
 
-  def invertedIndex : Map[String, List[DocData]] = {
-    docs.flatMap(doc => doc.tokens.map( token => ( token, new DocData((doc.ID, 1)) ) ).groupBy(_._1).mapValues(_.map(t => t._2).distinct.sorted.toList)).toMap
+//  def invertedIndex : Map[String, List[DocData]] = {
+//    docs.flatMap(doc => doc.tokens.map( token => ( token, new DocData((doc.ID, 1)) ) ).groupBy(_._1).mapValues(_.map(t => t._2).distinct.sorted.toList)).toMap
+//  }
+
+  // String, Int because docID is always -1, using doc name
+  def invertedIndex : Map[String, List[(String, Int)]] = {
+   postings(docs).toList.groupBy(_._1).mapValues(_.map(p => p._2).groupBy(identity).map{ case(id, list) => (id, list.size) }.toList)
   }
+
+  def postings (s: Stream[XMLDocument]): Stream[(String,String)] =
+    s.flatMap( d => d.tokens.map(token => (token,d.name) ))
 
   // if l1.length << l2.length, -> O(l1.length * log(l2.length))
   // TODO: (?) ^ add test for if length is much smaller, implement binary search

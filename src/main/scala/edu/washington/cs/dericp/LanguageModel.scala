@@ -41,5 +41,6 @@ class LanguageModel(val index: Map[String,List[(Int,Int)]], val docLength: Map[I
   def top100Docs(query: String): TopK[Int] = {
     // consider using TopK from breeze to keep top 100
     val result = new TopK[Int](100)
+    result
   }
 }

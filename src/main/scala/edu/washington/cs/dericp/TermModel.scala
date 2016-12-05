@@ -24,6 +24,6 @@ class TermModel(val index: Map[String,List[(Int,Int)]], val docLength: Map[Int,I
   // TODO: Once document representation is decided, use TopK to return top 100 docs
   def top100Docs(query: List[String]): TopK[Int] = {
     val result = new TopK[Int](100)
-
+    result
   }
 }
