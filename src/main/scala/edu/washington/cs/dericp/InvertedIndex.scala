@@ -11,6 +11,7 @@ class InvertedIndex(val docs : Stream[XMLDocument]) {
 //  }
 
   // String, Int because docID is always -1, using doc name
+  // TODO: Better to convert to getting frequencies of each document and re-ordering into inverted index?
   def invertedIndex : Map[String, List[(String, Int)]] = {
    postings(docs).toList.groupBy(_._1).mapValues(_.map(p => p._2).groupBy(identity).map{ case(id, list) => (id, list.size) }.toList)
   }

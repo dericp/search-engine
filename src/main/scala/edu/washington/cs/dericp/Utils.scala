@@ -7,6 +7,9 @@ import scala.io.Source
 
 /**
   * Created by erikawolfe on 12/3/16.
+  *
+  * TODO: Make sure we need all of these methods
+  *
   */
 object Utils {
   val STOP_WORDS = Source.fromFile("src/main/resources/stop-words.txt").getLines.toSet
@@ -28,23 +31,20 @@ object Utils {
   // TODO: (!!) REMEMBER TO BOUND THE DENOMINATOR MIN( (TP + FN), 100)
   // def avgPrec(): Unit = {}
 
-  def pruneStopWords(termFreq: Map[String, Int]): Map[String, Int] = {
+
+  ///////////////////////////////////////////////////////////
+  // Move methods above this line when you use them!
+  ///////////////////////////////////////////////////////////
+
+
+
+
+  def pruneStopWordsFromTF(termFreq: Map[String, Int]): Map[String, Int] = {
     termFreq.filterKeys(!STOP_WORDS.contains(_))
   }
 
   def getTermFrequencies(doc: XMLDocument): Map[String, Int] = {
-    Utils.pruneStopWords(doc.tokens.groupBy(identity).mapValues(termList => termList.size))
-  }
-
-  def getCodes(): Set[String] = {
-    val industryCodes = Source.fromFile("src/main/resources/codes/industry_codes.txt").getLines().map(line => line.split("\t")(0)).toSet
-    val regionCodes = Source.fromFile("src/main/resources/codes/region_codes.txt").getLines().map(line => line.split("\t")(0)).toSet
-    val topicCodes = Source.fromFile("src/main/resources/codes/topic_codes.txt").getLines().map(line => line.split("\t")(0)).toSet
-    industryCodes union regionCodes union topicCodes
-  }
-
-  def getTopCodes(docs: Stream[XMLDocument], numCodes: Int): Set[String] = {
-    docs.flatMap(_.codes).groupBy(identity).mapValues(l => l.length).toSeq.sortBy(-_._2).take(numCodes).map(_._1).toSet
+    Utils.pruneStopWordsFromTF(doc.tokens.groupBy(identity).mapValues(termList => termList.size))
   }
 
   // Takes an XMLDocument
@@ -54,7 +54,7 @@ object Utils {
   }
 
   def getTopTerms(docs: Stream[XMLDocument], numTerms: Int): Set[String] = {
-    pruneStopWords(docs.flatMap(_.tokens).groupBy(identity).mapValues(l => l.size)).toSeq.sortBy(-_._2).take(numTerms).map((t) => t._1).toSet
+    pruneStopWordsFromTF(docs.flatMap(_.tokens).groupBy(identity).mapValues(l => l.size)).toSeq.sortBy(-_._2).take(numTerms).map((t) => t._1).toSet
   }
 
   def getFeatureVector(docTermFreq: Map[String, Int], termToIndexInFeatureVector: Map[String, Int], dimensions: Int): DenseVector[Double] = {

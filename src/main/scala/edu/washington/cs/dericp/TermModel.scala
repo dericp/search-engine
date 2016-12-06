@@ -4,8 +4,12 @@ import breeze.util.TopK
 
 /**
   * Created by erikawolfe on 11/29/16.
+  *
+  *
+  * UPDATE TERM MODEL TEST FILE
+  *
   */
-class TermModel(val index: Map[String,List[(Int,Int)]], val docLength: Map[Int,Int]) {
+class TermModel(val index: Map[String,List[(String,Int)]], val docLength: Map[String,Int]) {
   // TODO: Normalize term frequency by max tf in document
 
   // Document frequencies = index.mapValues(_ => _.length)
@@ -16,14 +20,15 @@ class TermModel(val index: Map[String,List[(Int,Int)]], val docLength: Map[Int,I
 
   // Using simple scoring - sum of tf-idf scores of each query word, log of tf
   // TODO: Convert to use vector-based model and more complex scoring?
-  def tfIdfScore(query: List[String], docID: Int): Double = {
+  def tfIdfScore(query: List[String], docID: String): Double = {
     val ltf = query.map( term => term -> Math.log(1 + index(term).find(_._1 == docID).getOrElse((0, 0))._2)).toMap
     ltf.map{ case(term, ltf) => ltf * idf.getOrElse(term, 0.0) }.sum
   }
 
   // TODO: Once document representation is decided, use TopK to return top 100 docs
-  def top100Docs(query: List[String]): TopK[Int] = {
-    val result = new TopK[Int](100)
-    result
+  def topNDocs(query: List[String], n: Int): List[String] = {
+    // val result = new TopK[Int](100)
+    val tfIdfScores = docLength.map{ case(docID, len) => (docID, tfIdfScore(query, docID)) }.toList
+    tfIdfScores.sortBy(-_._2).take(n).map(_._1)
   }
 }
