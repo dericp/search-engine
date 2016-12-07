@@ -25,9 +25,8 @@ class TermModel(val index: Map[String,List[(String,Int)]], val docLength: Map[St
     ltf.map{ case(term, ltf) => ltf * idf.getOrElse(term, 0.0) }.sum
   }
 
-  // TODO: Once document representation is decided, use TopK to return top 100 docs
+  // TODO: Returns the top
   def topNDocs(query: List[String], n: Int): List[String] = {
-    // val result = new TopK[Int](100)
     val tfIdfScores = docLength.map{ case(docID, len) => (docID, tfIdfScore(query, docID)) }.toList
     tfIdfScores.sortBy(-_._2).take(n).map(_._1)
   }
