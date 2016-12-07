@@ -6,7 +6,6 @@ import ch.ethz.dal.tinyir.processing.{Document, XMLDocument}
   * Created by Isa on 11/27/2016.
   */
 
-case class TfTuple(term: String, doc: Int, count: Int)
 
 object Main {
 

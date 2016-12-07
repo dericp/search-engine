@@ -58,6 +58,61 @@ object InvertedIndex {
   }
 
 
+  // TODO: need to test this, no idea if it actually works
+  def listIntersection(query: List[String], index: Map[String, List[(String, Int)]]) : Seq[String] = {
+    // create output map, trimmed inverted index, and index counter
+    def output = scala.collection.mutable.Seq.empty
+    val queryIndex: Map[String, Vector[String]] = index.filter{case(term, _) => query.contains(term)}.mapValues(l => l.map(_._1).to[Vector])//_.to[Vector])
+    val counter = collection.mutable.Map() ++ queryIndex.mapValues(_ => 0)
+
+    // see if we have reached the end of a term's posting list
+    var keepSearching = true
+
+    // increment the index for a term in counter, check if we have reached end of posting list
+    def incrIndex(term: String): Unit = {
+      val newIndex = counter(term) + 1
+      if (newIndex < queryIndex(term).size) {
+        counter(term) = newIndex
+      } else {
+        keepSearching = false
+      }
+    }
+
+    // find min based on doc ID (_2) and return corresponding term
+    def min(a: (String, String), b: (String, String)) : String = {
+      if (a._2 < b._2) a._1
+      else b._1
+    }
+
+    // find max based on doc ID (_2) and return corresponding term
+    def max(a: (String, String), b: (String, String)) : String = {
+      if (a._2 > b._2) a._1
+      else b._1
+    }
+
+    // continuously search for intersections
+    while (keepSearching) {
+      // look at the current doc for each term
+      val termToCurrentDoc = counter.map{ case(term, index) => (term, queryIndex(term)(index)) }
+      val lowestTerm = termToCurrentDoc.reduceLeft(min)
+      val highestTermDoc = termToCurrentDoc(termToCurrentDoc.reduceLeft(max))
+      // if lowest doc == highest doc, we found intersection, otherwise increment the lowest doc and keep searching
+      if (termToCurrentDoc(lowestTerm).equals(highestTermDoc)) {
+        output ++ highestTermDoc
+        counter.foreach{case (term, _) => incrIndex(term)}
+      } else {
+        incrIndex(lowestTerm)
+      }
+    }
+
+    // returning the final list of doc IDs with all query words
+    output.toSeq
+  }
+
+
+
+
+
   // if l1.length << l2.length, -> O(l1.length * log(l2.length))
   // TODO: (?) ^ add test for if length is much smaller, implement binary search
   /*def intersect [A <% Result[A]] (l1: List[A], l2: List[A]) : List[A] = {
