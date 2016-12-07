@@ -23,8 +23,7 @@ object Main {
 //        .mapValues(_.map(tfT => (tfT.doc, tfT.count)).sorted
 
   def main(args: Array[String]): Unit = {
-    createShortenedJudgementFile
-
+    println(ScoringResources.getCorrectResults)
     ///////// INVERTED INDEX USING TERM MODEL TESTING
     // TODO: Use the whole document stream
 //    val docs = new TipsterStream ("src/main/resources/documents").stream.take(1000)
@@ -45,46 +44,6 @@ object Main {
 //    // println("score 2 (should be higher): " + termModel.tfIdfScore(query, doc2.name))
 //
 //    println(termModel.topNDocs(query, 15))
-  }
-
-  // creates a simplified version of "question-descriptions.txt" that has just
-  // each query number and each query, all on their own line
-  // stored as "simple-questions-descriptions.txt"
-  def createShortenedQueryFile: Unit = {
-    def shortenLine(line: String): String = {
-      if (line.startsWith("<num>")) {
-        line.substring(14).trim
-      } else if (line.startsWith("<title>")) {
-        line.substring(15).trim
-      } else {
-        throw new IllegalArgumentException("only lines beginning with <num> or <title> can be passed to shortenLine")
-      }
-    }
-
-    val lines = Source.fromFile("src/main/resources/questions-descriptions.txt").getLines.toList.filter(line => line.startsWith("<title>") || line.startsWith("<num>"))
-    val shortenedLines = lines.map(shortenLine(_))
-    val ps = new PrintStream("src/main/resources/simple-questions-descriptions.txt")
-    shortenedLines.map(ps.println(_))
-    ps.close()
-  }
-
-  // creates a simplified version of "relevance-judgements.csv" that has just
-  // [topic] [doc id]
-  // for the documents that are relevant to the topic
-  def createShortenedJudgementFile: Unit = {
-    val ps = new PrintStream("src/main/resources/simple-relevance-judgements.txt")
-    val input = new Scanner(new File("src/main/resources/relevance-judgements.csv"))
-
-    while(input.hasNextLine()) {
-      // format: 51 0 FR891103-0032 1
-      val line = input.nextLine().split("\\s+")
-
-      if (line.length > 3 && line(3) == "1") {
-        val topic = line(0)
-        val id = line(2)
-        ps.println(topic + " " + id)
-      }
-    }
   }
 }
 
