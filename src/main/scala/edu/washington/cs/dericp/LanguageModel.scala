@@ -38,6 +38,13 @@ class LanguageModel(val index: Map[String,List[(String,Int)]], val docLength: Ma
     termProbs + log(lambda)
   }
 
+  def topNDocs(query: List[String], n: Int, lambda: Double): List[String] = {
+    val pdqs = docLength.keys.map(d => (d, findLogPQDSmooth(query, d, lambda))).toList
+    pdqs.sortBy(-_._2).take(n).map(_._1)
+  }
+
+
+
   // TODO:  Write method to return top 100 docs by logpqd
   def top100Docs(query: String): TopK[Int] = {
     // consider using TopK from breeze to keep top 100
