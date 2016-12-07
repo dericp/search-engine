@@ -11,8 +11,8 @@ object InvertedIndexTest {
     val docs = new TipsterStream("src/main/resources/documents")
 
 
-    val invertedIndex = new InvertedIndex(docs.stream.take(10));
-    println(invertedIndex.invertedIndex)
+    // val invertedIndex = new InvertedIndex(docs.stream.take(10));
+    // println(invertedIndex.invertedIndex)
 
   }
 

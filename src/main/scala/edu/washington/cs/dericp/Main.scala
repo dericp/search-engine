@@ -1,9 +1,4 @@
 package edu.washington.cs.dericp
-import java.io.PrintStream
-import java.util.Scanner
-
-import scala.io.Source
-import java.io.File
 import ch.ethz.dal.tinyir.io.TipsterStream
 import ch.ethz.dal.tinyir.processing.{Document, XMLDocument}
 
@@ -23,12 +18,20 @@ object Main {
 //        .mapValues(_.map(tfT => (tfT.doc, tfT.count)).sorted
 
   def main(args: Array[String]): Unit = {
-    println(ScoringResources.getCorrectResults)
-    ///////// INVERTED INDEX USING TERM MODEL TESTING
     // TODO: Use the whole document stream
-//    val docs = new TipsterStream ("src/main/resources/documents").stream.take(1000)
-//    val invInd = new InvertedIndex(docs).invertedIndex
-//    val docLengths = docs.map(doc => (doc.name -> doc.tokens.length)).toMap
+    val docs = new TipsterStream ("src/main/resources/documents").stream.take(10)
+    val invInd1 = InvertedIndex.invertedIndex(docs)
+    println("finished building index")
+    // InvertedIndex.printIndexToFile(invInd1)
+
+    // val invInd2 = InvertedIndex.readIndexFromFile("src/main/resources/inverted-index.txt")
+    // println(invInd1)
+    // println(invInd2)
+    // println("hiii")
+
+
+    ///////// INVERTED INDEX USING TERM MODEL TESTING
+    //    val docLengths = docs.map(doc => (doc.name -> doc.tokens.length)).toMap
 //    val termModel = new TermModel(invInd, docLengths)
 //
 //    // common words: society, cages, 000
