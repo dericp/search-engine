@@ -19,6 +19,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     // TODO: Use the whole document stream
+
     val docs = new TipsterStream ("src/main/resources/documents").stream.take(10)
     val invInd1 = InvertedIndex.invertedIndex(docs)
     println("finished building index")
@@ -47,6 +48,7 @@ object Main {
 //    // println("score 2 (should be higher): " + termModel.tfIdfScore(query, doc2.name))
 //
 //    println(termModel.topNDocs(query, 15))
+
   }
 }
 
