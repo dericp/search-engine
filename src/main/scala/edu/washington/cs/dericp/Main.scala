@@ -9,7 +9,7 @@ import ch.ethz.dal.tinyir.processing.{Document, XMLDocument}
 
 object Main {
 
-  def listIntersection(query: List[String], index: Map[String, List[(String, Int)]]) = {
+  /*def listIntersection(query: List[String], index: Map[String, List[(String, Int)]]) = {
     // create output map, trimmed inverted index, and index counter
     def output = scala.collection.mutable.Seq.empty
     val queryIndex: Map[String, Vector[String]] = index.filter{case(term, _) => query.contains(term)}.mapValues(l => l.map(_._1).to[Vector])//_.to[Vector])
@@ -54,7 +54,7 @@ object Main {
   def max(a: (String, String), b: (String, String)) : String = {
     if (a._2 > b._2) a._1
     else b._1
-  }
+  }*/
 
   def main(args: Array[String]): Unit = {
     // TODO: Use the whole document stream

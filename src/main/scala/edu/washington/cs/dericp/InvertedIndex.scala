@@ -83,29 +83,29 @@ object InvertedIndex {
     }
 
     // find min based on doc ID (_2) and return corresponding term
-    def min(a: (String, String), b: (String, String)) : String = {
-      if (a._2 < b._2) a._1
-      else b._1
+    def min(a: (String, String), b: (String, String)) : (String, String) = {
+      if (a._2 < b._2) a
+      else b
     }
 
     // find max based on doc ID (_2) and return corresponding term
-    def max(a: (String, String), b: (String, String)) : String = {
-      if (a._2 > b._2) a._1
-      else b._1
+    def max(a: (String, String), b: (String, String)) : (String, String) = {
+      if (a._2 > b._2) a
+      else b
     }
 
     // continuously search for intersections
     while (keepSearching) {
       // look at the current doc for each term
       val termToCurrentDoc = counter.map{ case(term, index) => (term, queryIndex(term)(index)) }
-      val lowestTerm = termToCurrentDoc.reduceLeft(min)
-      val highestTermDoc = termToCurrentDoc(termToCurrentDoc.reduceLeft(max))
+      val lowestTermTuple = termToCurrentDoc.foldLeft(("", "ZZZZZZZZZZZZZZZ"))(min)
+      val highestTermDoc = termToCurrentDoc(termToCurrentDoc.foldLeft(("", ""))(max)._1)
       // if lowest doc == highest doc, we found intersection, otherwise increment the lowest doc and keep searching
-      if (termToCurrentDoc(lowestTerm).equals(highestTermDoc)) {
+      if (termToCurrentDoc(lowestTermTuple._1).equals(highestTermDoc)) {
         output ++ highestTermDoc
         counter.foreach{case (term, _) => incrIndex(term)}
       } else {
-        incrIndex(lowestTerm)
+        incrIndex(lowestTermTuple._1)
       }
     }
 
