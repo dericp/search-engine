@@ -13,12 +13,13 @@ import scala.io.Source
   * FIX INVERTED INDEX TEST
   */
 object InvertedIndex {
-  // String, Int because docID is always -1, using doc name
+  val MIN_NUM_DOCS = 5
 
-  // TODO: Better to convert to getting frequencies of each document and re-ordering into inverted index?
   def invertedIndex(docs : Stream[XMLDocument]) : Map[String, List[DocData]] = {
-    // maybe remove the first toList
-    postings(docs).groupBy(_._1).mapValues(_.map(p => p._2).groupBy(identity).map{ case(id, list) => (id, list.size) }.map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted)
+    postings(docs).groupBy(_._1).mapValues(_.map(p => p._2).groupBy(identity).map{ case(id, list) => (id, list.size) }.
+      map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted).
+      filter{ case(key, value) => !Utils.STOP_WORDS.contains(key) && value.length > MIN_NUM_DOCS }
+    // TODO: Figure out if we should be more careful when deleting word pairs with low document frequency
   }
 
   // returns a collection of tuples, (token, docData)
@@ -43,15 +44,16 @@ object InvertedIndex {
     val lines: Iterator[Array[String]] = Source.fromFile(filePath).getLines().map(l => l.split("\\s+"))
 
     def addLineToIndex(line: Array[String]): Unit = {
-      if (line.isEmpty) { return }
-      val word = line(0)
-      // pairs "doc,freq" without parens
-      def docFreqs = line.slice(1, line.length).map(str => str.substring(1, str.length - 1))
-      val docFreqPairs = docFreqs.map{str =>
-        val a = str.split(",")
-        (a(0), a(1).toInt)
-      }.toList
-      index.+=((word, docFreqPairs))
+      if (!line.isEmpty) {
+        val word = line(0)
+        // pairs "doc,freq" without parens
+        def docFreqs = line.slice(1, line.length).map(str => str.substring(1, str.length - 1))
+        val docFreqPairs = docFreqs.map { str =>
+          val a = str.split(",")
+          (a(0), a(1).toInt)
+        }.toList
+        index.+=((word, docFreqPairs))
+      }
     }
 
     lines.foreach(addLineToIndex(_))

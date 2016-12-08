@@ -3,7 +3,6 @@ package edu.washington.cs.dericp
 import java.io.{File, PrintStream}
 import java.util.Scanner
 
-import scala.collection.immutable.HashMap
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
@@ -22,7 +21,6 @@ object ScoringResources {
       val query = input.nextLine()
       queryPairs.+=((num, query))
     }
-
     queryPairs
   }
 
@@ -33,23 +31,23 @@ object ScoringResources {
     val results = new collection.mutable.HashMap[Int, ListBuffer[String]]
 
     def addResult(line: String): Unit = {
-      val key = line.substring(0, 2).toInt
-      val value = line.substring(3)
-      if (!results.contains(key)) {
-        results(key) = new ListBuffer[String]
+      if (line != "") {
+        val key = line.substring(0, 2).toInt
+        val value = line.substring(3)
+        if (!results.contains(key)) {
+          results(key) = new ListBuffer[String]
+        }
+        results(key).+=(value)
       }
-      results(key).+=(value)
     }
-
     lines.foreach(addResult(_))
     results
   }
 
-
   // creates a simplified version of "question-descriptions.txt" that has just
   // each query number and each query, all on their own line
   // stored as "simple-questions-descriptions.txt"
-  def createShortenedQueryFile: Unit = {
+  def createShortenedQueryFile(): Unit = {
     def shortenLine(line: String): String = {
       if (line.startsWith("<num>")) {
         line.substring(14).trim
@@ -71,7 +69,7 @@ object ScoringResources {
   // creates a simplified version of "relevance-judgements.csv" that has just
   // [topic] [doc id]
   // for the documents that are relevant to the topic
-  def createShortenedJudgementFile: Unit = {
+  def createShortenedJudgementFile(): Unit = {
     val ps = new PrintStream("src/main/resources/simple-relevance-judgements.txt")
     val input = new Scanner(new File("src/main/resources/relevance-judgements.csv"))
 
