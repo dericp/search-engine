@@ -15,12 +15,14 @@ object InvertedIndex {
   // String, Int because docID is always -1, using doc name
 
   // TODO: Better to convert to getting frequencies of each document and re-ordering into inverted index?
-  def invertedIndex(docs : Stream[XMLDocument]) : Map[String, List[(String, Int)]] = {
-   postings(docs).toList.groupBy(_._1).mapValues(_.map(p => p._2).groupBy(identity).map{ case(id, list) => (id, list.size) }.toList)
+  def invertedIndex(docs : Stream[XMLDocument]) : Map[String, List[DocData]] = {
+    // maybe remove the first toList
+   postings(docs).groupBy(_._1).mapValues(_.map(p => p._2).groupBy(identity).map{ case(id, list) => (id, list.size) }.map(tuple => new DocData(tuple._1, tuple._2)).toList)
   }
 
+  // returns a collection of tuples, (token, docData)
   def postings (s: Stream[XMLDocument]): Stream[(String,String)] =
-    s.flatMap( d => d.tokens.map(token => (token,d.name) ))
+    s.flatMap( d => d.tokens.map(token => (token, d.name) ))
 
   def printIndexToFile(invInd: Map[String, List[(String, Int)]]): Unit = {
     val pw = new PrintWriter("src/main/resources/inverted-index.txt")
@@ -59,10 +61,12 @@ object InvertedIndex {
 
 
   // TODO: need to test this, no idea if it actually works
-  def listIntersection(query: List[String], index: Map[String, List[(String, Int)]]) : Seq[String] = {
+  def listIntersection(query: List[String], index: Map[String, List[DocData]]) : Seq[String] = {
     // create output map, trimmed inverted index, and index counter
     def output = scala.collection.mutable.Seq.empty
-    val queryIndex: Map[String, Vector[String]] = index.filter{case(term, _) => query.contains(term)}.mapValues(l => l.map(_._1).to[Vector])//_.to[Vector])
+    // why dis is vector
+    val queryIndex: Map[String, Vector[String]] = index.filter{case(term, _) => query.contains(term)}.mapValues(l => l.map(_.id()).to[Vector])//_.to[Vector])
+    // doc id list for each term to index we're looking at
     val counter = collection.mutable.Map() ++ queryIndex.mapValues(_ => 0)
 
     // see if we have reached the end of a term's posting list

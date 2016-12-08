@@ -62,6 +62,7 @@ object Main {
     val docs = new TipsterStream ("src/main/resources/documents").stream.take(10)
     val invInd1 = InvertedIndex.invertedIndex(docs)
     println("finished building index")
+    println(invInd1)
     // InvertedIndex.printIndexToFile(invInd1)
 
     // val invInd2 = InvertedIndex.readIndexFromFile("src/main/resources/inverted-index.txt")

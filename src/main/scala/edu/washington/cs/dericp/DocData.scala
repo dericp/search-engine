@@ -2,23 +2,25 @@ package edu.washington.cs.dericp
 import ch.ethz.dal.tinyir.indexing.Result
 import ch.ethz.dal.tinyir.processing.XMLDocument
 
-class DocData(data: (Int, Int)) extends Ordered[DocData] {
-  def id() : Int = {
-    data._1
+class DocData(val docID: String, val freq: Int) extends Ordered[DocData] {
+  def id() : String = {
+    docID
   }
 
-  def matches(that : (Int, Int)) : Int = {
-    data._1 - that._1
+  def matches(that : DocData) : Int = {
+    this.docID compare that.docID
   }
 
   // need to do some term frequency stuff here
-  def matched(that: (Int, Int)) : (Int, Int) = {
-    (data._1, data._2 + that._2)
+  def matched(that: DocData) : DocData = {
+    new DocData(id(), this.freq + that.freq)
   }
 
-  override def compare(that: DocData): Int = id() - that.id()
+  override def compare(that: DocData): Int = {
+    this.matches(that)
+  }
 
   override def toString: String = {
-    data._1 + " " + data._2
+    this.docID + " " + this.freq
   }
 }
