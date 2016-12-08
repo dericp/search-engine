@@ -4,6 +4,7 @@ import java.io.PrintWriter
 import ch.ethz.dal.tinyir.processing.XMLDocument
 
 import scala.collection.immutable.HashMap
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 /**
@@ -17,7 +18,7 @@ object InvertedIndex {
   // TODO: Better to convert to getting frequencies of each document and re-ordering into inverted index?
   def invertedIndex(docs : Stream[XMLDocument]) : Map[String, List[DocData]] = {
     // maybe remove the first toList
-   postings(docs).groupBy(_._1).mapValues(_.map(p => p._2).groupBy(identity).map{ case(id, list) => (id, list.size) }.map(tuple => new DocData(tuple._1, tuple._2)).toList)
+    postings(docs).groupBy(_._1).mapValues(_.map(p => p._2).groupBy(identity).map{ case(id, list) => (id, list.size) }.map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted)
   }
 
   // returns a collection of tuples, (token, docData)
@@ -61,9 +62,9 @@ object InvertedIndex {
 
 
   // TODO: need to test this, no idea if it actually works
-  def listIntersection(query: List[String], index: Map[String, List[DocData]]) : Seq[String] = {
+  def listIntersection(query: List[String], index: Map[String, List[DocData]]) : List[String] = {
     // create output map, trimmed inverted index, and index counter
-    def output = scala.collection.mutable.Seq.empty
+    val output = scala.collection.mutable.ListBuffer.empty[String]
     // why dis is vector
     val queryIndex: Map[String, Vector[String]] = index.filter{case(term, _) => query.contains(term)}.mapValues(l => l.map(_.id()).to[Vector])//_.to[Vector])
     // doc id list for each term to index we're looking at
@@ -98,19 +99,25 @@ object InvertedIndex {
     while (keepSearching) {
       // look at the current doc for each term
       val termToCurrentDoc = counter.map{ case(term, index) => (term, queryIndex(term)(index)) }
-      val lowestTermTuple = termToCurrentDoc.foldLeft(("", "ZZZZZZZZZZZZZZZ"))(min)
-      val highestTermDoc = termToCurrentDoc(termToCurrentDoc.foldLeft(("", ""))(max)._1)
+      val lowestTermTuple = termToCurrentDoc.foldRight(("", "ZZZZZZZZZZZZZZZ"))(min)
+      val highestTermDoc = termToCurrentDoc(termToCurrentDoc.foldRight(("", ""))(max)._1)
+      println("lowest: " + lowestTermTuple)
+      println("hightest: " + highestTermDoc)
+      println("==========================")
       // if lowest doc == highest doc, we found intersection, otherwise increment the lowest doc and keep searching
       if (termToCurrentDoc(lowestTermTuple._1).equals(highestTermDoc)) {
-        output ++ highestTermDoc
+        println("hiiiii")
+        //println(highestTermDoc)
+        output += highestTermDoc
         counter.foreach{case (term, _) => incrIndex(term)}
       } else {
+        println("hello")
         incrIndex(lowestTermTuple._1)
       }
     }
 
     // returning the final list of doc IDs with all query words
-    output.toSeq
+    output.toList
   }
 
 

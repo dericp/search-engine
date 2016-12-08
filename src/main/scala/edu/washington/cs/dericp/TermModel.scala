@@ -26,8 +26,8 @@ class TermModel(val index: Map[String,List[(String,Int)]], val docLength: Map[St
   }
 
   // TODO: Returns the top
-  def topNDocs(query: List[String], n: Int): List[String] = {
-    val tfIdfScores = docLength.map{ case(docID, len) => (docID, tfIdfScore(query, docID)) }.toList
+  def topNDocs(query: List[String], n: Int, shortenedDocList: Seq[String]): List[String] = {
+    val tfIdfScores = shortenedDocList.map(docID => (docID, tfIdfScore(query, docID))).toList
     tfIdfScores.sortBy(-_._2).take(n).map(_._1)
   }
 }
