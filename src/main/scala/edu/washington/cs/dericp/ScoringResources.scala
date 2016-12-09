@@ -1,6 +1,6 @@
 package edu.washington.cs.dericp
 
-import java.io.{File, PrintStream}
+import java.io.{File, PrintStream, Serializable}
 import java.util.Scanner
 
 import scala.collection.mutable.ListBuffer
@@ -10,6 +10,54 @@ import scala.io.Source
   * Created by erikawolfe on 12/6/16.
   */
 object ScoringResources {
+
+  case class Scores(precision: Double, recall: Double, f1: Double, avgPrecision: Double)
+
+  def getScoresFromResults(queryNum: Int, results: List[String]): Scores = {
+    val correctResults = getCorrectResults.getOrElse(queryNum, List[String]()).toSet
+    val truePos = results.toSet.intersect(correctResults).size
+    val falsePos = results.size - truePos
+    val falseNeg = correctResults.size - truePos
+    val precision = precision(truePos, falsePos)
+    val recall = recall(truePos, falseNeg)
+    val f1 = f1Score(precision, recall)
+    val ap = avgPrec(results, correctResults, falseNeg)
+    return new Scores(precision, recall, f1, ap)
+  }
+
+  def precision(truePos: Int, falsePos: Int): Double = truePos.toDouble / (truePos + falsePos)
+
+  def recall(truePos: Int, falseNeg: Int): Double = truePos.toDouble / (truePos + falseNeg)
+
+  def f1Score(p: Double, r: Double): Double = { 2 * p * r / (p + r) }
+
+  def f1Score(truePos: Int, falsePos: Int, falseNeg: Int): Double = {
+    val p = precision(truePos, falsePos)
+    val r = recall(truePos, falseNeg)
+    2 * p * r / (p + r)
+  }
+
+  // TODO: (!!) REMEMBER TO BOUND THE DENOMINATOR MIN( (TP + FN), 100)
+  // AP = (SUM (Precision at rank k * (1 if doc is relevant, 0 otherwise))) / MIN(truePos + falseNeg, correctResults.size)
+  def avgPrec(results: List[String], correctResults: Set[String], falseNeg: Int): Double = {
+    val correctResultsSet = correctResults.toSet
+    var precisionSum = 0.0
+    var truePos = 0
+    var falsePos = 0
+
+    for (i <- results.indices ) {
+      if (correctResultsSet.contains(results(i))) {
+        truePos += 1
+      } else {
+        falsePos += 1
+      }
+      precisionSum += precision(truePos, falsePos)
+    }
+    precisionSum / Math.min(truePos + falseNeg, correctResults.size).toDouble
+  }
+
+  def meanAvgPrec(avgPrecList: List[Double]) = avgPrecList.sum / avgPrecList.length
+
 
   // Returns the queries to be used to test the scoring algorithms
   // In a ListBuffer of (Int, String) meaning (query #, query)
@@ -25,8 +73,8 @@ object ScoringResources {
   }
 
   // Returns the correct documents for each query
-  // In a map from query number --> correct documents
-  def getCorrectResults: collection.mutable.HashMap[Int, ListBuffer[String]] = {
+  // In a map from query number --> Set of correct documents
+  def getCorrectResults: scala.collection.Map[Int, List[String]] = {
     val lines = Source.fromFile("src/main/resources/simple-relevance-judgements.txt").getLines()
     val results = new collection.mutable.HashMap[Int, ListBuffer[String]]
 
@@ -41,7 +89,7 @@ object ScoringResources {
       }
     }
     lines.foreach(addResult(_))
-    results
+    results.mapValues(l => l.toList)
   }
 
   // creates a simplified version of "question-descriptions.txt" that has just
