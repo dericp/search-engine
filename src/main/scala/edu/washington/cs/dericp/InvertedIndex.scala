@@ -47,13 +47,15 @@ object InvertedIndex {
     *
     * @param invIdx the inverted index
     */
-  def writeInvertedIndexToFile(invIdx: Map[String, List[(String, Int)]]): Unit = {
-    val pw = new PrintWriter("src/main/resources/inverted-index.txt")
+  def writeInvertedIndexToFile(invIdx: Map[String, List[DocData]]): Unit = {
+    val pw = new PrintWriter("src/main/resources/inverted-index")
 
     // method writes a line to a file
-    def writeLineToFile(wordVals: (String, List[(String, Int)])): Unit = {
-      pw.print(wordVals._1 + " ")  // writing word
-      val line = wordVals._2.mkString(" ")
+    def writeLineToFile(termToDocDatas: (String, List[DocData])): Unit = {
+      // write the term
+      pw.print(termToDocDatas._1 + " ")
+      // get the docIDs to counts
+      val line = termToDocDatas._2.mkString(" ")
       pw.println(line)
     }
 
@@ -68,22 +70,18 @@ object InvertedIndex {
     * @param filepath
     * @return
     */
-  def readInvertedIndexFromFile(filepath: String): Map[String, List[(String, Int)]] = {
-    val invIdx = new collection.mutable.HashMap[String, List[(String, Int)]]
+  def readInvertedIndexFromFile(filepath: String) : Map[String, List[DocData]] = {
+    val invIdx = new collection.mutable.HashMap[String, List[DocData]]
     val lines: Iterator[Array[String]] = Source.fromFile(filepath).getLines().map(l => l.split("\\s+"))
 
     // add a line from the file to the inverted index
     def addLineToIndex(line: Array[String]): Unit = {
       if (!line.isEmpty) {
-        val word = line(0)
-        // pairs "doc,freq" without parens
-        // TODO: why is docFreqs a def?
-        def docFreqs = line.slice(1, line.length).map(str => str.substring(1, str.length - 1))
-        val docFreqPairs = docFreqs.map { str =>
-          val a = str.split(",")
-          (a(0), a(1).toInt)
-        }.toList
-        invIdx.+=((word, docFreqPairs))
+        val term = line(0)
+        // collection of tuples (docID, freq)
+        val docIDsAndFreqs = line.drop(1).map(str => str.split(":"))
+        val docDatas = docIDsAndFreqs.map{ arr => new DocData(arr(0), arr(1).toInt) }.toList
+        invIdx += ((term, docDatas))
       }
     }
 

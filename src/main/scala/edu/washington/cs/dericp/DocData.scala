@@ -21,6 +21,6 @@ class DocData(val docID: String, val freq: Int) extends Ordered[DocData] {
   }
 
   override def toString: String = {
-    this.docID + " " + this.freq
+    this.docID + ":" + this.freq
   }
 }

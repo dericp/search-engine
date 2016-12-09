@@ -154,3 +154,6 @@ project/boot/
 
 # Big data files
 documents.zip
+
+# Ignore previously created inverted index files
+inverted-index
