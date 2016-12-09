@@ -13,7 +13,7 @@ object ScoringResources {
 
   case class Scores(precision: Double, recall: Double, f1: Double, avgPrecision: Double)
 
-  def getScoresFromResults(queryNum: Int, results: List[String]): Scores = {
+  /*def getScoresFromResults(queryNum: Int, results: List[String]): Scores = {
     val correctResults = getCorrectResults.getOrElse(queryNum, List[String]()).toSet
     val truePos = results.toSet.intersect(correctResults).size
     val falsePos = results.size - truePos
@@ -23,7 +23,7 @@ object ScoringResources {
     val f1 = f1Score(precision, recall)
     val ap = avgPrec(results, correctResults, falseNeg)
     return new Scores(precision, recall, f1, ap)
-  }
+  }*/
 
   def precision(truePos: Int, falsePos: Int): Double = truePos.toDouble / (truePos + falsePos)
 
