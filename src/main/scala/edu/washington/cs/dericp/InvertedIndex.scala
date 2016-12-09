@@ -5,17 +5,17 @@ import ch.ethz.dal.tinyir.processing.XMLDocument
 import scala.io.Source
 
 object InvertedIndex {
-  // the minimum number of documents a word must appear in --- this helps prune typos
+  // the minimum number of documents a term must appear in --- this helps prune typos
   val MIN_NUM_DOCS = 5
 
   /**
     * Builds an inverted index and returns it as a Map.
     *
     * @param docs stream of XMLDocument objects that represents the document collection
-    * @return map from the term/word to a list of DocData objects
+    * @return map from the term to a list of DocData objects
     */
   def invertedIndex(docs : Stream[XMLDocument]) : Map[String, List[DocData]] = {
-    // TODO: Figure out if we should be more careful when deleting word pairs with low document frequency
+    // TODO: Figure out if we should be more careful when deleting term pairs with low document frequency
     postings(docs)
     // [(token, docID), ...]
         .groupBy(_._1)
@@ -28,7 +28,7 @@ object InvertedIndex {
         // {token -> {docID -> docIDCount, ...}, ...}
         .map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted)
         // {token -> [DocData1, DocData2, ...], ...}
-        // get rip of stop words and rarely occuring words
+        // get rip of stop words and rarely occurring term
         .filter{ case(key, value) => !Utils.STOP_WORDS.contains(key) && value.length > MIN_NUM_DOCS }
   }
 
@@ -93,23 +93,30 @@ object InvertedIndex {
   }
 
 
-  // TODO: need to test this, no idea if it actually works
-  def listIntersection(query: List[String], index: Map[String, List[DocData]]) : List[String] = {
-    // create output map, trimmed inverted index, and index counter
+  /**
+    *
+    * @param query
+    * @param invIdx
+    * @return
+    */
+  def listIntersection(query: List[String], invIdx: Map[String, List[DocData]]) : List[String] = {
+    // list of the docIDs that contain all terms in the query
     val output = scala.collection.mutable.ListBuffer.empty[String]
-    // why dis is vector
-    val queryIndex: Map[String, Vector[String]] = index.filter{case(term, _) => query.contains(term)}.mapValues(l => l.map(_.id()).to[Vector])//_.to[Vector])
-    // doc id list for each term to index we're looking at
-    val counter = collection.mutable.Map() ++ queryIndex.mapValues(_ => 0)
+    // the inverted index but only with the terms in the query
+    // TODO: make sure we actually need to use a vector here
+    val termToDocIDsOnlyQueryTerms: Map[String, Vector[String]] =
+      invIdx.filter{ case(term, _) => query.contains(term) }.mapValues(docDatas => docDatas.map(_.id()).to[Vector])
+    // each terms mapped to the index we're currently looking at
+    val termToCurrIdx = collection.mutable.Map() ++ termToDocIDsOnlyQueryTerms.mapValues(_ => 0)
 
-    // see if we have reached the end of a term's posting list
+    // see if we have reached the end of a term's doc list
     var keepSearching = true
 
-    // increment the index for a term in counter, check if we have reached end of posting list
-    def incrIndex(term: String): Unit = {
-      val newIndex = counter(term) + 1
-      if (newIndex < queryIndex(term).size) {
-        counter(term) = newIndex
+    // increment the index for a term in termToCurrIdx, check if we have reached end of posting list
+    def incrIdx(term: String): Unit = {
+      val newIndex = termToCurrIdx(term) + 1
+      if (newIndex < termToDocIDsOnlyQueryTerms(term).size) {
+        termToCurrIdx(term) = newIndex
       } else {
         keepSearching = false
       }
@@ -130,25 +137,28 @@ object InvertedIndex {
     // continuously search for intersections
     while (keepSearching) {
       // look at the current doc for each term
-      val termToCurrentDoc = counter.map{ case(term, index) => (term, queryIndex(term)(index)) }
-      val lowestTermTuple = termToCurrentDoc.foldRight(("", "ZZZZZZZZZZZZZZZ"))(min)
-      val highestTermDoc = termToCurrentDoc(termToCurrentDoc.foldRight(("", ""))(max)._1)
-      println("lowest: " + lowestTermTuple)
-      println("hightest: " + highestTermDoc)
-      println("==========================")
+      val termToCurrDocID = termToCurrIdx.map{ case(term, index) => (term, termToDocIDsOnlyQueryTerms(term)(index)) }
+      val termWithLowestIdx = termToCurrDocID.foldRight(("", "ZZZZZZZZZZZZZZZ"))(min)._1
+      val docIDWithLowestIdx = termToCurrDocID(termWithLowestIdx)
+      val docIDWithHighestIdx = termToCurrDocID(termToCurrDocID.foldRight(("", ""))(max)._1)
+
+      //println("lowest: " + termWithLowestIdx)
+      //println("hightest: " + docIDWithHighestIdx)
+      //println("==========================")
+
       // if lowest doc == highest doc, we found intersection, otherwise increment the lowest doc and keep searching
-      if (termToCurrentDoc(lowestTermTuple._1).equals(highestTermDoc)) {
-        println("hiiiii")
+      if (docIDWithLowestIdx.equals(docIDWithHighestIdx)) {
+        //println("hiiiii")
         //println(highestTermDoc)
-        output += highestTermDoc
-        counter.foreach{case (term, _) => incrIndex(term)}
+        output += docIDWithHighestIdx
+        termToCurrIdx.foreach{ case (term, _) => incrIdx(term) }
       } else {
-        println("hello")
-        incrIndex(lowestTermTuple._1)
+        //println("hello")
+        incrIdx(termWithLowestIdx)
       }
     }
 
-    // returning the final list of doc IDs with all query words
+    // returning the final list of doc IDs with all query terms
     output.toList
   }
 }
