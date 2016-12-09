@@ -1,21 +1,27 @@
 package edu.washington.cs.dericp
 
+import scala.io.StdIn
 import ch.ethz.dal.tinyir.io.TipsterStream
 
 object Main {
 
   def main(args: Array[String]): Unit = {
-    val docs = new TipsterStream ("src/main/resources/documents").stream.take(10)
-    val invIdx = InvertedIndex.invertedIndex(docs)
+    println("Which relevance model would you like to use? LANGUAGE or TERM:")
+    val model = StdIn.readLine()
+    println("Using " + model + " model.")
+    println()
 
-    for (doc <- docs) {
-      println(doc.tokens)
-    }
-    println("finished building index")
+    println("Please enter your query:")
+    val query = StdIn.readLine().split("\\s+")
 
-    val shortDocList = InvertedIndex.listIntersection(List("hens"), invIdx)
+    //val docs = new TipsterStream ("src/main/resources/documents").stream.take(10)
+    //val invIdx = InvertedIndex.invertedIndex(docs)
 
+    //println("finished building index")
 
+    //val shortDocList = InvertedIndex.listIntersection(List("hens"), invIdx)
+
+    //println(shortDocList)
 
     ///////// INVERTED INDEX USING TERM MODEL TESTING
     //    val docLengths = docs.map(doc => (doc.name -> doc.tokens.length)).toMap
