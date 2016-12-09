@@ -6,6 +6,7 @@ import ch.ethz.dal.tinyir.io.TipsterStream
 object Main {
 
   def main(args: Array[String]): Unit = {
+    val docs = new TipsterStream ("src/main/resources/documents").stream.take(10)
     println("Which relevance model would you like to use? LANGUAGE or TERM:")
     val model = StdIn.readLine()
     println("Using " + model + " model.")
@@ -13,9 +14,21 @@ object Main {
 
     println("Please enter your query:")
     val query = StdIn.readLine().split("\\s+")
+    println()
 
-    //val docs = new TipsterStream ("src/main/resources/documents").stream.take(10)
-    //val invIdx = InvertedIndex.invertedIndex(docs)
+    println("Build a new inverted index from scratch? y/n:")
+    val newIndex = StdIn.readLine().toBoolean
+
+    val invIdx = {
+      if (newIndex) {
+        val docs = new TipsterStream ("src/main/resources/documents").stream//.take(10)
+        InvertedIndex.invertedIndex(docs)
+      } else {
+        InvertedIndex.readInvertedIndexFromFile("src/main/resources/inverted-index.txt")
+      }
+    }
+
+
 
     //println("finished building index")
 
