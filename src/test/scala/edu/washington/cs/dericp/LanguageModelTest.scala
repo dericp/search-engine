@@ -5,9 +5,9 @@ import org.junit.Test
 
 class LanguageModelTest {
 
-  val index : Map[String,List[(String,Int)]] = Map("the" -> List(("0", 2), ("1", 3), ("2", 1)),
-    "big" -> List(("0", 1), ("2", 1)), "red" -> List(("1", 1)), "house" -> List(("1", 1), ("2", 1)),
-    "is" -> List(("0", 1), ("1", 1), ("2", 1)))
+  val index : Map[String,List[DocData]] = Map("the" -> List(new DocData("0", 2), new DocData("1", 3), new DocData("2", 1)),
+    "big" -> List(new DocData("0", 1), new DocData("2", 1)), "red" -> List(new DocData("1", 1)), "house" -> List(new DocData("1", 1), new DocData("2", 1)),
+    "is" -> List(new DocData("0", 1), new DocData("1", 1), new DocData("2", 1)))
   val docLength : Map[String,Int] = Map("0" -> 4, "1" -> 6, "2" -> 4)
 
   val lm: LanguageModel = new LanguageModel(index, docLength)
