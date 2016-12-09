@@ -1,6 +1,6 @@
 package edu.washington.cs.dericp
-import java.io.PrintWriter
 
+import java.io.PrintWriter
 import ch.ethz.dal.tinyir.processing.XMLDocument
 import scala.io.Source
 
