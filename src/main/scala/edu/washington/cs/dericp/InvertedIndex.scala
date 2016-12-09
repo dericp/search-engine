@@ -6,7 +6,7 @@ import scala.io.Source
 
 object InvertedIndex {
   // the minimum number of documents a term must appear in --- this helps prune typos
-  val MIN_NUM_DOCS = 5
+  val MIN_NUM_DOCS = 1
 
   /**
     * Builds an inverted index and returns it as a Map.
@@ -29,7 +29,7 @@ object InvertedIndex {
         .map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted)
         // {token -> [DocData1, DocData2, ...], ...}
         // get rip of stop words and rarely occurring term
-        .filter{ case(key, value) => !Utils.STOP_WORDS.contains(key) && value.length > MIN_NUM_DOCS }
+        .filter{ case(key, value) => !Utils.STOP_WORDS.contains(key) && value.length >= MIN_NUM_DOCS }
   }
 
   /**
@@ -139,6 +139,7 @@ object InvertedIndex {
       // look at the current doc for each term
       val termToCurrDocID = termToCurrIdx.map{ case(term, index) => (term, termToDocIDsOnlyQueryTerms(term)(index)) }
       val termWithLowestIdx = termToCurrDocID.foldRight(("", "ZZZZZZZZZZZZZZZ"))(min)._1
+      // TODO: need to handle case where term isn't in any documents
       val docIDWithLowestIdx = termToCurrDocID(termWithLowestIdx)
       val docIDWithHighestIdx = termToCurrDocID(termToCurrDocID.foldRight(("", ""))(max)._1)
 

@@ -7,9 +7,13 @@ object Main {
   def main(args: Array[String]): Unit = {
     val docs = new TipsterStream ("src/main/resources/documents").stream.take(10)
     val invIdx = InvertedIndex.invertedIndex(docs)
+
+    for (doc <- docs) {
+      println(doc.tokens)
+    }
     println("finished building index")
 
-    val shortDocList = InvertedIndex.listIntersection(List("the"), invIdx)
+    val shortDocList = InvertedIndex.listIntersection(List("hens"), invIdx)
 
 
 
