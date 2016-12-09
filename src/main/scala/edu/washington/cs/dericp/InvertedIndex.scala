@@ -2,64 +2,94 @@ package edu.washington.cs.dericp
 import java.io.PrintWriter
 
 import ch.ethz.dal.tinyir.processing.XMLDocument
-
-import scala.collection.immutable.HashMap
-import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-/**
-  * Created by dericp on 11/29/16.
-  *
-  * FIX INVERTED INDEX TEST
-  */
 object InvertedIndex {
+  // the minimum number of documents a word must appear in --- this helps prune typos
   val MIN_NUM_DOCS = 5
 
+  /**
+    * Builds an inverted index and returns it as a Map.
+    *
+    * @param docs stream of XMLDocument objects that represents the document collection
+    * @return map from the term/word to a list of DocData objects
+    */
   def invertedIndex(docs : Stream[XMLDocument]) : Map[String, List[DocData]] = {
-    postings(docs).groupBy(_._1).mapValues(_.map(p => p._2).groupBy(identity).map{ case(id, list) => (id, list.size) }.
-      map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted).
-      filter{ case(key, value) => !Utils.STOP_WORDS.contains(key) && value.length > MIN_NUM_DOCS }
     // TODO: Figure out if we should be more careful when deleting word pairs with low document frequency
+    postings(docs)
+    // [(token, docID), ...]
+        .groupBy(_._1)
+        // {token -> [(token, docID), ...], ...}
+        .mapValues(_.map(tuple => tuple._2)
+        // {token -> [docID, ...], ...}
+        .groupBy(identity)
+        // {token -> {docID -> [docID, docID, ...], ...}, ...}
+        .map{ case(docID, docIDs) => (docID, docIDs.size) }
+        // {token -> {docID -> docIDCount, ...}, ...}
+        .map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted)
+        // {token -> [DocData1, DocData2, ...], ...}
+        // get rip of stop words and rarely occuring words
+        .filter{ case(key, value) => !Utils.STOP_WORDS.contains(key) && value.length > MIN_NUM_DOCS }
   }
 
-  // returns a collection of tuples, (token, docData)
-  def postings (s: Stream[XMLDocument]): Stream[(String,String)] =
-    s.flatMap( d => d.tokens.map(token => (token, d.name) ))
+  /**
+    * Creates the postings list.
+    *
+    * @param docs stream of XMLDocument objects that represents the document collection
+    * @return stream of tuples (token, docID)
+    */
+  def postings (docs: Stream[XMLDocument]): Stream[(String, String)] = {
+    docs.flatMap(doc => doc.tokens.map(token => (token, doc.name)))
+  }
 
-  def printIndexToFile(invInd: Map[String, List[(String, Int)]]): Unit = {
+  /**
+    * Writes the inverted index to a file.
+    *
+    * @param invIdx the inverted index
+    */
+  def writeInvertedIndexToFile(invIdx: Map[String, List[(String, Int)]]): Unit = {
     val pw = new PrintWriter("src/main/resources/inverted-index.txt")
-    invInd.foreach(writeLineToFile(_))
 
+    // method writes a line to a file
     def writeLineToFile(wordVals: (String, List[(String, Int)])): Unit = {
       pw.print(wordVals._1 + " ")  // writing word
       val line = wordVals._2.mkString(" ")
       pw.println(line)
     }
 
+    invIdx.foreach(writeLineToFile(_))
+
     pw.close()
   }
 
-  def readIndexFromFile(filePath: String): Map[String, List[(String, Int)]] = {
-    val index = new collection.mutable.HashMap[String, List[(String, Int)]]
-    val lines: Iterator[Array[String]] = Source.fromFile(filePath).getLines().map(l => l.split("\\s+"))
+  /**
+    * Reads an inverted index from a file.
+    *
+    * @param filepath
+    * @return
+    */
+  def readInvertedIndexFromFile(filepath: String): Map[String, List[(String, Int)]] = {
+    val invIdx = new collection.mutable.HashMap[String, List[(String, Int)]]
+    val lines: Iterator[Array[String]] = Source.fromFile(filepath).getLines().map(l => l.split("\\s+"))
 
+    // add a line from the file to the inverted index
     def addLineToIndex(line: Array[String]): Unit = {
       if (!line.isEmpty) {
         val word = line(0)
         // pairs "doc,freq" without parens
+        // TODO: why is docFreqs a def?
         def docFreqs = line.slice(1, line.length).map(str => str.substring(1, str.length - 1))
         val docFreqPairs = docFreqs.map { str =>
           val a = str.split(",")
           (a(0), a(1).toInt)
         }.toList
-        index.+=((word, docFreqPairs))
+        invIdx.+=((word, docFreqPairs))
       }
     }
 
     lines.foreach(addLineToIndex(_))
 
-
-    Map().++(index)
+    Map() ++ invIdx
   }
 
 
@@ -121,33 +151,5 @@ object InvertedIndex {
     // returning the final list of doc IDs with all query words
     output.toList
   }
-
-
-
-
-
-  // if l1.length << l2.length, -> O(l1.length * log(l2.length))
-  // TODO: (?) ^ add test for if length is much smaller, implement binary search
-  /*def intersect [A <% Result[A]] (l1: List[A], l2: List[A]) : List[A] = {
-    var result = List[A]()
-    val len1 = l1.length
-    val len2 = l2.length
-    var index1 = 0
-    var index2 = 0
-
-    while(index1 < len1 && index2 < len2) {
-      val n = l1(index1) matches l2(index2)
-      if (n > 0) {
-        index2 += 1
-      } else if (n < 0) {
-        index1 += 1
-      } else {
-        result = result.::(l1(index1))
-        index1 += 1
-        index2 += 1
-      }
-    }
-    result
-  }*/
 }
 
