@@ -21,7 +21,7 @@ object Main {
     val invIdx = {
       if (newIndex) {
         val docs = new TipsterStream ("src/main/resources/documents").stream//.take(10)
-        InvertedIndex.invertedIndex(docs)
+        InvertedIndex.createInvertedIndex(docs)
       } else {
         InvertedIndex.readInvertedIndexFromFile("src/main/resources/inverted-index.txt")
       }

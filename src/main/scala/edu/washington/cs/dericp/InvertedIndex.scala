@@ -14,7 +14,7 @@ object InvertedIndex {
     * @param docs stream of XMLDocument objects that represents the document collection
     * @return map from the term to a list of DocData objects
     */
-  def invertedIndex(docs : Stream[XMLDocument]) : Map[String, List[DocData]] = {
+  def createInvertedIndex(docs : Stream[XMLDocument]) : Map[String, List[DocData]] = {
     // TODO: Figure out if we should be more careful when deleting term pairs with low document frequency
     postings(docs)
     // [(token, docID), ...]
