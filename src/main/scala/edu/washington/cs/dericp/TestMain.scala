@@ -5,7 +5,7 @@ import ch.ethz.dal.tinyir.io.TipsterStream
 object TestMain {
 
   def main(args: Array[String]): Unit = {
-    // code to write the whole inverted-index to disk
+    // code to write the whole inverted-index to a file
     val docs = new TipsterStream ("src/main/resources/documents").stream//.take(10)
     val invIdx = InvertedIndex.createInvertedIndex(docs)
     InvertedIndex.writeInvertedIndexToFile(invIdx)

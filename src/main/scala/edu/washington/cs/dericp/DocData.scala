@@ -11,7 +11,6 @@ class DocData(val docID: String, val freq: Int) extends Ordered[DocData] {
     this.docID compare that.docID
   }
 
-  // need to do some term frequency stuff here
   def matched(that: DocData) : DocData = {
     new DocData(id(), this.freq + that.freq)
   }
