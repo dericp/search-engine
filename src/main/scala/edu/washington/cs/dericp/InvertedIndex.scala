@@ -1,23 +1,21 @@
 package edu.washington.cs.dericp
 
 import java.io.PrintWriter
+
+import ch.ethz.dal.tinyir.io.TipsterStream
 import ch.ethz.dal.tinyir.processing.XMLDocument
+
 import scala.io.Source
 
 object InvertedIndex {
   // the minimum number of documents a term must appear in --- this helps prune typos
   val MIN_NUM_DOCS = 1
 
-  /**
-    * Builds an inverted index and returns it as a Map.
-    *
-    * @param docs stream of XMLDocument objects that represents the document collection
-    * @return map from the term to a list of DocData objects
-    */
-  def createInvertedIndex(docs : Stream[XMLDocument]) : Map[String, List[DocData]] = {
-    // TODO: Figure out if we should be more careful when deleting term pairs with low document frequency
-    postings(docs)
-    // [(token, docID), ...]
+  def createInvertedIndex(filepath: String): Map[String, List[DocData]] = {
+    // XMLDocument stream
+    def docs = new TipsterStream(filepath).stream
+    docs.flatMap(doc => doc.tokens.filter(!Utils.STOP_WORDS.contains(_)).map(token => (token, doc.name)))
+    // [(token, docID), ...] - stop words
         .groupBy(_._1)
         // {token -> [(token, docID), ...], ...}
         .mapValues(_.map(tuple => tuple._2)
@@ -29,17 +27,7 @@ object InvertedIndex {
         .map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted)
         // {token -> [DocData1, DocData2, ...], ...}
         // get rip of stop words and rarely occurring term
-        .filter{ case(key, value) => !Utils.STOP_WORDS.contains(key) && value.length >= MIN_NUM_DOCS }
-  }
-
-  /**
-    * Creates the postings list.
-    *
-    * @param docs stream of XMLDocument objects that represents the document collection
-    * @return stream of tuples (token, docID)
-    */
-  def postings (docs: Stream[XMLDocument]): Stream[(String, String)] = {
-    docs.flatMap(doc => doc.tokens.map(token => (token, doc.name)))
+        //.filter{ case(key, value) => value.length >= MIN_NUM_DOCS }
   }
 
   /**
