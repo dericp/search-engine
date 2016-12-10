@@ -13,17 +13,21 @@ object ScoringResources {
 
   case class Scores(precision: Double, recall: Double, f1: Double, avgPrecision: Double)
 
-  /*def getScoresFromResults(queryNum: Int, results: List[String]): Scores = {
-    val correctResults = getCorrectResults.getOrElse(queryNum, List[String]()).toSet
+  def getScoresFromResults(results: List[String], correctResults: Set[String]): Scores = {
     val truePos = results.toSet.intersect(correctResults).size
     val falsePos = results.size - truePos
     val falseNeg = correctResults.size - truePos
-    val precision = precision(truePos, falsePos)
-    val recall = recall(truePos, falseNeg)
-    val f1 = f1Score(precision, recall)
+    val p = precision(truePos, falsePos)
+    val r = recall(truePos, falseNeg)
+    val f1 = f1Score(p, r)
     val ap = avgPrec(results, correctResults, falseNeg)
-    return new Scores(precision, recall, f1, ap)
-  }*/
+    return new Scores(p, r, f1, ap)
+  }
+
+  def getScoresFromResults(queryNum: Int, results: List[String]): Scores = {
+    val correctResults = getCorrectResults.getOrElse(queryNum, List[String]()).toSet
+    getScoresFromResults(results, correctResults)
+  }
 
   def precision(truePos: Int, falsePos: Int): Double = truePos.toDouble / (truePos + falsePos)
 
@@ -58,10 +62,14 @@ object ScoringResources {
 
   def meanAvgPrec(avgPrecList: List[Double]) = avgPrecList.sum / avgPrecList.length
 
+  def meanAvgPrecComplex(scoresList: List[Scores]): Double = {
+    meanAvgPrec(scoresList.map(_.avgPrecision))
+  }
+
 
   // Returns the queries to be used to test the scoring algorithms
   // In a ListBuffer of (Int, String) meaning (query #, query)
-  def getQueries: ListBuffer[(Int, String)] = {
+  def getQueries: List[(Int, String)] = {
     val queryPairs = new ListBuffer[(Int, String)]
     val input = new Scanner(new File("src/main/resources/simple-questions-descriptions.txt"))
     while(input.hasNextLine) {
@@ -69,7 +77,7 @@ object ScoringResources {
       val query = input.nextLine()
       queryPairs.+=((num, query))
     }
-    queryPairs
+    queryPairs.toList
   }
 
   // Returns the correct documents for each query
