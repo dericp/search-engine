@@ -48,10 +48,10 @@ object ScoringResources {
     for (i <- results.indices ) {
       if (correctResultsSet.contains(results(i))) {
         truePos += 1
+        precisionSum += precision(truePos, falsePos)
       } else {
         falsePos += 1
       }
-      precisionSum += precision(truePos, falsePos)
     }
     precisionSum / Math.min(truePos + falseNeg, correctResults.size).toDouble
   }
