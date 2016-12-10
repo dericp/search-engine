@@ -2,6 +2,7 @@ package edu.washington.cs.dericp
 
 import scala.io.StdIn
 import ch.ethz.dal.tinyir.io.TipsterStream
+import com.github.aztek.porterstemmer.PorterStemmer
 
 object Main {
 
@@ -12,7 +13,7 @@ object Main {
     println()
 
     println("Please enter your query:")
-    val query = StdIn.readLine().split("\\s+")
+    val query = StdIn.readLine().split("\\s+").map(term => PorterStemmer.stem(term))
     println()
 
     println("Build a new inverted index from scratch? y/n:")
@@ -20,8 +21,7 @@ object Main {
 
     val invIdx = {
       if (newIndex) {
-        val docs = new TipsterStream ("src/main/resources/documents").stream//.take(10)
-        InvertedIndex.createInvertedIndex(docs)
+        InvertedIndex.createInvertedIndex("src/main/resources/documents")
       } else {
         InvertedIndex.readInvertedIndexFromFile("src/main/resources/inverted-index.txt")
       }

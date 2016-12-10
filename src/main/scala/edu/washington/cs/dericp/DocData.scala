@@ -22,4 +22,9 @@ class DocData(val docID: String, val freq: Int) extends Ordered[DocData] {
   override def toString: String = {
     this.docID + ":" + this.freq
   }
+
+  override def equals(o: Any): Boolean = o match {
+    case docData: DocData => this.docID.equals(docData.docID) && this.freq.equals(docData.freq)
+    case _ => false
+  }
 }

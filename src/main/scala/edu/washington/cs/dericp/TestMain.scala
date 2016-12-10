@@ -1,13 +1,14 @@
 package edu.washington.cs.dericp
 
 import ch.ethz.dal.tinyir.io.TipsterStream
+import com.github.aztek.porterstemmer.PorterStemmer
 
 object TestMain {
 
   def main(args: Array[String]): Unit = {
     // code to write the whole inverted-index to a file
-    val docs = new TipsterStream ("src/main/resources/documents").stream//.take(10)
-    val invIdx = InvertedIndex.createInvertedIndex(docs)
+    val invIdx = InvertedIndex.createInvertedIndex("src/main/resources/documents")
+    println("finished creating index")
     InvertedIndex.writeInvertedIndexToFile(invIdx)
 
     //println("finished building index")

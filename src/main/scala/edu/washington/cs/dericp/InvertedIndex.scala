@@ -4,18 +4,19 @@ import java.io.PrintWriter
 
 import ch.ethz.dal.tinyir.io.TipsterStream
 import ch.ethz.dal.tinyir.processing.XMLDocument
+import com.github.aztek.porterstemmer.PorterStemmer
 
 import scala.io.Source
 
 object InvertedIndex {
   // the minimum number of documents a term must appear in --- this helps prune typos
-  val MIN_NUM_DOCS = 1
+  val MIN_NUM_DOCS = 5
 
   def createInvertedIndex(filepath: String): Map[String, List[DocData]] = {
     // XMLDocument stream
-    def docs = new TipsterStream(filepath).stream
-    docs.flatMap(doc => doc.tokens.filter(!Utils.STOP_WORDS.contains(_)).map(token => (token, doc.name)))
-    // [(token, docID), ...] - stop words
+    def docs = new TipsterStream(filepath).stream.take(10000)
+    docs.flatMap(doc => doc.tokens.filter(!Utils.STOP_WORDS.contains(_)).map(token => (PorterStemmer.stem(token), doc.name)))
+    // [(token, docID), ...] minus stop words and stems
         .groupBy(_._1)
         // {token -> [(token, docID), ...], ...}
         .mapValues(_.map(tuple => tuple._2)
@@ -27,7 +28,7 @@ object InvertedIndex {
         .map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted)
         // {token -> [DocData1, DocData2, ...], ...}
         // get rip of stop words and rarely occurring term
-        //.filter{ case(key, value) => value.length >= MIN_NUM_DOCS }
+        .filter{ case(key, value) => value.length >= MIN_NUM_DOCS }
   }
 
   /**
