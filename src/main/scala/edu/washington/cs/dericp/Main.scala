@@ -16,8 +16,11 @@ object Main {
     val query = StdIn.readLine().split("\\s+").map(term => PorterStemmer.stem(term))
     println()
 
-    println("Build a new inverted index from scratch? y/n:")
+    println("Build a new inverted index from scratch? TRUE/FALSE:")
     val newIndex = StdIn.readLine().toBoolean
+    println()
+
+    println("Building inverted index...")
 
     val invIdx = {
       if (newIndex) {
