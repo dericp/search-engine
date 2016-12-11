@@ -83,12 +83,18 @@ object InvertedIndex {
     * @param invIdx
     * @return
     */
-  def listIntersection(query: Seq[String], invIdx: Map[String, Seq[DocData]]) : Seq[String] = {
+  def listIntersection(query: Seq[String], invIdx: Map[String, Seq[DocData]]): Seq[String] = {
     // list of the docIDs that contain all terms in the query
     val output = scala.collection.mutable.ListBuffer.empty[String]
     // the inverted index but only with the terms in the query
     val termToDocIDsOnlyQueryTerms: Map[String, Seq[String]] =
       invIdx.filter{ case(term, _) => query.contains(term) }.mapValues(docDatas => docDatas.map(_.id()).toVector)
+
+    // case where none of the query terms show up in the documents
+    if (termToDocIDsOnlyQueryTerms.isEmpty) {
+      return Vector.empty
+    }
+
     // each terms mapped to the index we're currently looking at
     val termToCurrIdx = collection.mutable.Map() ++ termToDocIDsOnlyQueryTerms.mapValues(_ => 0)
 
