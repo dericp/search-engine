@@ -1,11 +1,8 @@
 package edu.washington.cs.dericp
 
 import java.io.PrintWriter
-
 import ch.ethz.dal.tinyir.io.TipsterStream
-import ch.ethz.dal.tinyir.processing.XMLDocument
 import com.github.aztek.porterstemmer.PorterStemmer
-
 import scala.io.Source
 
 object InvertedIndex {
@@ -90,9 +87,8 @@ object InvertedIndex {
     // list of the docIDs that contain all terms in the query
     val output = scala.collection.mutable.ListBuffer.empty[String]
     // the inverted index but only with the terms in the query
-    // TODO: make sure we actually need to use a vector here
-    val termToDocIDsOnlyQueryTerms: Map[String, Vector[String]] =
-      invIdx.filter{ case(term, _) => query.contains(term) }.mapValues(docDatas => docDatas.map(_.id()).to[Vector])
+    val termToDocIDsOnlyQueryTerms: Map[String, Seq[String]] =
+      invIdx.filter{ case(term, _) => query.contains(term) }.mapValues(docDatas => docDatas.map(_.id()).toVector)
     // each terms mapped to the index we're currently looking at
     val termToCurrIdx = collection.mutable.Map() ++ termToDocIDsOnlyQueryTerms.mapValues(_ => 0)
 
@@ -130,14 +126,9 @@ object InvertedIndex {
       val docIDWithLowestIdx = termToCurrDocID(termWithLowestIdx)
       val docIDWithHighestIdx = termToCurrDocID(termToCurrDocID.foldRight(("", ""))(max)._1)
 
-      //println("lowest: " + termWithLowestIdx)
-      //println("hightest: " + docIDWithHighestIdx)
-      //println("==========================")
-
-      // if lowest doc == highest doc, we found intersection, otherwise increment the lowest doc and keep searching
+      // if lowest doc == highest doc, we found intersection
+      // otherwise increment the lowest doc and keep searching
       if (docIDWithLowestIdx.equals(docIDWithHighestIdx)) {
-        //println("hiiiii")
-        //println(highestTermDoc)
         output += docIDWithHighestIdx
         termToCurrIdx.foreach{ case (term, _) => incrIdx(term) }
       } else {

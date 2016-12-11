@@ -20,9 +20,20 @@ object Main {
       if (newIndex) {
         InvertedIndex.createInvertedIndex("src/main/resources/documents")
       } else {
-        InvertedIndex.readInvertedIndexFromFile("inverted-index")
+        println("What is the relative filepath of the saved inverted index?")
+        val invIdxFilepath = StdIn.readLine()
+        InvertedIndex.readInvertedIndexFromFile(invIdxFilepath)
       }
     }
+
+    if (newIndex) {
+      println("Would you like to save this inverted index to a file? TRUE/FALSE:")
+      if (StdIn.readLine().toBoolean) {
+        println("What is the relative filepath you would like to save this inverted index to?")
+        InvertedIndex.writeInvertedIndexToFile(invIdx, StdIn.readLine())
+      }
+    }
+    println()
 
     println("Building relevance model...")
 
@@ -32,8 +43,8 @@ object Main {
 
     // TODO: figure out the other case?
     val relevanceModel = model match {
-      case "LANGUAGE" => new LanguageModel(invIdx, docLengths, .01)
-      case "TERM" => new TermModel(invIdx, docLengths)
+      case "language" => new LanguageModel(invIdx, docLengths, .01)
+      case "term" => new TermModel(invIdx, docLengths)
       case _ => throw new IllegalArgumentException("Invalid relevance model name. Please enter one of the options.")
     }
 
