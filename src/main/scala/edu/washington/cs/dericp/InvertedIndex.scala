@@ -83,16 +83,16 @@ object InvertedIndex {
     * @param invIdx
     * @return
     */
-  def listIntersection(query: Seq[String], invIdx: Map[String, Seq[DocData]]): Seq[String] = {
+  def listIntersection(query: Seq[String], n: Int, invIdx: Map[String, Seq[DocData]]): Set[String] = {
     // list of the docIDs that contain all terms in the query
-    val output = scala.collection.mutable.ListBuffer.empty[String]
+    val output = scala.collection.mutable.HashSet.empty[String]
     // the inverted index but only with the terms in the query
     val termToDocIDsOnlyQueryTerms: Map[String, Seq[String]] =
       invIdx.filter{ case(term, _) => query.contains(term) }.mapValues(docDatas => docDatas.map(_.id()).toVector)
 
     // case where none of the query terms show up in the documents
     if (termToDocIDsOnlyQueryTerms.isEmpty) {
-      return Vector.empty
+      return Set.empty
     }
 
     // each terms mapped to the index we're currently looking at
@@ -143,8 +143,15 @@ object InvertedIndex {
       }
     }
 
-    // returning the final list of doc IDs with all query terms
-    output.toVector
+    // if we didn't find enough terms, delete the minimum query term from the query and go again
+    if (output.size < n) {
+      val minTerm = termToDocIDsOnlyQueryTerms.keysIterator
+        .reduceLeft((x, y) => if (termToDocIDsOnlyQueryTerms(x).size < termToDocIDsOnlyQueryTerms(y).size) x else y)
+      listIntersection(query.filter(!_.equals(minTerm)), n, invIdx)
+    } else {
+      // returning the final list of doc IDs with all query terms
+      output.toSet
+    }
   }
 }
 
