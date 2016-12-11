@@ -77,7 +77,6 @@ object ScoringResources {
     queries.mapValues(q => lm.topNDocs(q, 100))
   }
 
-  // TODO: test
   def computeScores(queryResults: Map[Int, Seq[String]]): Map[Int, Scores] = {
     queryResults.map{ case(q, results) => (q, getScoresFromResults(q, results))}
   }

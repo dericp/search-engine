@@ -41,7 +41,6 @@ object Main {
     def docs = new TipsterStream("src/main/resources/documents").stream.take(1000)
     val docLengths = docs.map(doc => (doc.name -> doc.tokens.length)).toMap
 
-    // TODO: figure out the other case?
     val relevanceModel = model match {
       case "language" => new LanguageModel(invIdx, docLengths, .01)
       case "term" => new TermModel(invIdx, docLengths)
