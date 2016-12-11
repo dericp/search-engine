@@ -45,11 +45,10 @@ class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[St
     termProbs + log(lambda)
   }
 
-  // TODO: if less docs that contain all words, do we just search on everything or do we priotitize docs with everything
   def topNDocs(query: Seq[String], n: Int): Seq[String] = {
-    val containAllQueryWords = InvertedIndex.listIntersection(query, index)
+    val containAllQueryWords = InvertedIndex.listIntersection(query, n, index)
     var docsToSearch = docLengths.keys
-    println(containAllQueryWords.size)
+    //println(containAllQueryWords.size)
     if (containAllQueryWords.size >= n) {
       docsToSearch = docsToSearch.filter(d => containAllQueryWords.contains(d))
     }
