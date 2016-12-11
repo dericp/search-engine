@@ -14,7 +14,7 @@ object InvertedIndex {
 
   def createInvertedIndex(filepath: String): Map[String, List[DocData]] = {
     // XMLDocument stream
-    def docs = new TipsterStream(filepath).stream.take(10000)
+    def docs = new TipsterStream(filepath).stream//.take(10000)
     docs.flatMap(doc => doc.tokens.filter(!Utils.STOP_WORDS.contains(_)).map(token => (PorterStemmer.stem(token), doc.name)))
     // [(token, docID), ...] minus stop words and stems
         .groupBy(_._1)
@@ -37,7 +37,7 @@ object InvertedIndex {
     * @param invIdx the inverted index
     */
   def writeInvertedIndexToFile(invIdx: Map[String, List[DocData]]): Unit = {
-    val pw = new PrintWriter("src/main/resources/inverted-index")
+    val pw = new PrintWriter("src/main/resources/inverted-index.txt")
 
     // method writes a line to a file
     def writeLineToFile(termToDocDatas: (String, List[DocData])): Unit = {

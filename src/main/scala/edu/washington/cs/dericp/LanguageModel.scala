@@ -31,7 +31,7 @@ class LanguageModel(val index: Map[String,List[DocData]], val docLength: Map[Str
     tf.toDouble / docLength.getOrElse(doc, 0)
   }
 
-  // probably delete this later!!!!!
+  // TODO: probably delete this later!!!!!
   // find P(q|d)
   def findLogPQD(query: List[String], doc: String) : Double = {
     query.map(w => log(findPWD(w, doc))).sum
@@ -44,17 +44,17 @@ class LanguageModel(val index: Map[String,List[DocData]], val docLength: Map[Str
     termProbs + log(lambda)
   }
 
+  // TODO: if less docs that contain all words, do we just search on everything or do we priotitize docs with everything
   def topNDocs(query: List[String], n: Int, lambda: Double): List[String] = {
-    val pdqs = docLength.keys.map(d => (d, findLogPQDSmooth(query, d, lambda))).toList
+    val containAllQueryWords = InvertedIndex.listIntersection(query, index)
+    var docsToSearch = docLength.keys
+    println(containAllQueryWords.size)
+    if (containAllQueryWords.size >= n) {
+      docsToSearch = docsToSearch.filter(d => containAllQueryWords.contains(d))
+    }
+    val pdqs = docsToSearch.map(d => (d, findLogPQDSmooth(query, d, lambda))).toList
     pdqs.sortBy(-_._2).take(n).map(_._1)
   }
 
 
-
-  // TODO:  Write method to return top 100 docs by logpqd
-  def top100Docs(query: String): TopK[Int] = {
-    // consider using TopK from breeze to keep top 100
-    val result = new TopK[Int](100)
-    result
-  }
 }
