@@ -32,11 +32,11 @@ object InvertedIndexTest {
     //println(b(PorterStemmer.stem("society")).toString)
     println("creating langmodel")
 
-    val lm = new LanguageModel(b, c.toMap)
+    val lm = new LanguageModel(b, c.toMap, .01)
 
     println("done creating langmodel")
 
-    println(lm.topNDocs(q, 3, 0.05).toString)
+    println(lm.topNDocs(q, 3).toString)
 
   }
 

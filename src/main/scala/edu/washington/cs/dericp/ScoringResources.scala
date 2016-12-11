@@ -71,7 +71,7 @@ object ScoringResources {
   // TODO: test, create term model option
   def getLangModelResults(lm: LanguageModel): Map[Int, List[String]] = {
     val queries = getQueries.toMap.mapValues(q => q.split("\\s+").toList.map(term => PorterStemmer.stem(term)))
-    queries.mapValues(q => lm.topNDocs(q, 100, .01))
+    queries.mapValues(q => lm.topNDocs(q, 100))
   }
 
   // TODO: test
