@@ -143,11 +143,11 @@ object InvertedIndex {
       }
     }
 
-    // if we didn't find enough terms, delete the minimum query term from the query and go again
+    // if we didn't find enough terms, delete the term that occurs in the most docs from the query and go again
     if (output.size < n) {
-      val minTerm = termToDocIDsOnlyQueryTerms.keysIterator
-        .reduceLeft((x, y) => if (termToDocIDsOnlyQueryTerms(x).size < termToDocIDsOnlyQueryTerms(y).size) x else y)
-      listIntersection(query.filter(!_.equals(minTerm)), n, invIdx)
+      val maxTerm = termToDocIDsOnlyQueryTerms.keysIterator
+        .reduceLeft((x, y) => if (termToDocIDsOnlyQueryTerms(x).size > termToDocIDsOnlyQueryTerms(y).size) x else y)
+      listIntersection(query.filter(!_.equals(maxTerm)), n, invIdx)
     } else {
       // returning the final list of doc IDs with all query terms
       output.toSet
