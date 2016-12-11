@@ -11,7 +11,7 @@ object InvertedIndex {
 
   def createInvertedIndex(filepath: String): Map[String, Seq[DocData]] = {
     // XMLDocument stream
-    def docs = new TipsterStream(filepath).stream.take(1000)
+    def docs = new TipsterStream(filepath).stream//.take(1000)
     docs.flatMap(doc => doc.tokens.filter(!Utils.STOP_WORDS.contains(_)).map(token => (PorterStemmer.stem(token), doc.name)))
     // [(token, docID), ...] minus stop words and stems
         .groupBy(_._1)
