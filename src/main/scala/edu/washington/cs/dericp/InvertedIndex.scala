@@ -78,6 +78,8 @@ object InvertedIndex {
 
 
   /**
+    * Returns a set of document IDs that contain a subset of the query terms. If the number of documents
+    * cannot reach n, this method will return an empty set.
     *
     * @param query
     * @param invIdx

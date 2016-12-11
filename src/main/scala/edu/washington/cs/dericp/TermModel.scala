@@ -25,11 +25,11 @@ class TermModel(val index: Map[String,Seq[DocData]], val docLength: Map[String,I
 
   // TODO: Returns the top
   def topNDocs(query: Seq[String], n: Int): Seq[String] = {
-    val containAllQueryWords = InvertedIndex.listIntersection(query, n, index)
+    val trimmedIndex = InvertedIndex.listIntersection(query, n, index)
     var shortenedDocList = docLength.keys
-    println(containAllQueryWords.size)
-    if (containAllQueryWords.size >= n) {
-      shortenedDocList = shortenedDocList.filter(d => containAllQueryWords.contains(d))
+    println(trimmedIndex.size)
+    if (!trimmedIndex.isEmpty) {
+      shortenedDocList = shortenedDocList.filter(d => trimmedIndex.contains(d))
     }
     val tfIdfScores = shortenedDocList.map(docID => (docID, tfIdfScore(query, docID))).toVector
     tfIdfScores.sortBy(-_._2).take(n).map(_._1)
