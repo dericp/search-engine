@@ -10,8 +10,8 @@ class LanguageModelTest {
     "is" -> List(new DocData("0", 1), new DocData("1", 1), new DocData("2", 1)))
   val docLength : Map[String,Int] = Map("0" -> 4, "1" -> 6, "2" -> 4)
 
-  val lm: LanguageModel = new LanguageModel(index, docLength)
   val lambda = 0.01
+  val lm: LanguageModel = new LanguageModel(index, docLength, lambda)
   val query = List("house", "is", "red")
 
 

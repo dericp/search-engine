@@ -7,7 +7,8 @@ import scala.math.log
 /**
   * Created by Isa on 11/27/2016.
   */
-class LanguageModel(val index: Map[String,List[DocData]], val docLength: Map[String,Int]) {
+class LanguageModel(val index: Map[String,List[DocData]], val docLength: Map[String,Int], lambda: Double)
+  extends RetrievalModel {
   // currently a unigram model
 
   def getDocDataFromList(doc: String, list: List[DocData]) : DocData = {
@@ -45,7 +46,7 @@ class LanguageModel(val index: Map[String,List[DocData]], val docLength: Map[Str
   }
 
   // TODO: if less docs that contain all words, do we just search on everything or do we priotitize docs with everything
-  def topNDocs(query: List[String], n: Int, lambda: Double): List[String] = {
+  def topNDocs(query: List[String], n: Int): List[String] = {
     val containAllQueryWords = InvertedIndex.listIntersection(query, index)
     var docsToSearch = docLength.keys
     println(containAllQueryWords.size)
