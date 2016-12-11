@@ -17,8 +17,11 @@ object ScoringResources {
 
   def getScoresFromResults(results: List[String], correctResults: Set[String]): Scores = {
     val truePos = results.toSet.intersect(correctResults).size
+    //println("TP: " + truePos)
     val falsePos = results.size - truePos
+    //println("FP: " + falsePos)
     val falseNeg = correctResults.size - truePos
+    //println("FN: " + falseNeg)
     val p = precision(truePos, falsePos)
     val r = recall(truePos, falseNeg)
     val f1 = f1Score(p, r)
@@ -102,7 +105,7 @@ object ScoringResources {
     def addResult(line: String): Unit = {
       if (line != "") {
         val key = line.substring(0, 2).toInt
-        val value = line.substring(3)
+        val value = line.substring(3).trim.replace("-", "")
         if (!results.contains(key)) {
           results(key) = new ListBuffer[String]
         }
