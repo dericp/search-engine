@@ -46,11 +46,11 @@ class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[St
   }
 
   def topNDocs(query: Seq[String], n: Int): Seq[String] = {
-    val containAllQueryWords = InvertedIndex.listIntersection(query, n, index)
+    val trimmedIndex = InvertedIndex.listIntersection(query, n, index)
     var docsToSearch = docLengths.keys
     //println(containAllQueryWords.size)
-    if (containAllQueryWords.size >= n) {
-      docsToSearch = docsToSearch.filter(d => containAllQueryWords.contains(d))
+    if (!trimmedIndex.isEmpty) {
+      docsToSearch = docsToSearch.filter(d => trimmedIndex.contains(d))
     }
     val pdqs = docsToSearch.map(d => (d, findLogPQDSmooth(query, d, lambda))).toIndexedSeq
     pdqs.sortBy(-_._2).take(n).map(_._1)

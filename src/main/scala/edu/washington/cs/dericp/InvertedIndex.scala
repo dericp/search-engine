@@ -138,7 +138,6 @@ object InvertedIndex {
         output += docIDWithHighestIdx
         termToCurrIdx.foreach{ case (term, _) => incrIdx(term) }
       } else {
-        //println("hello")
         incrIdx(termWithLowestIdx)
       }
     }

@@ -69,7 +69,7 @@ object InvertedIndexTest {
 //    println(scores(52).avgPrecision)
 //    println()
 
-    println(ScoringResources.meanAvgPrecComplex(scores.values.toList))
+    println(ScoringResources.meanAvgPrec(scores.values.toList))
 
   }
 

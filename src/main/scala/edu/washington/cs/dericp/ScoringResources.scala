@@ -64,21 +64,22 @@ object ScoringResources {
     precisionSum / Math.min(truePos + falseNeg, correctResults.size).toDouble
   }
 
-  // TODO: do we need both?
-  def meanAvgPrec(avgPrecList: Seq[Double]) = avgPrecList.sum / avgPrecList.length
-
-  def meanAvgPrecComplex(scoresList: Seq[Scores]): Double = {
-    meanAvgPrec(scoresList.map(_.avgPrecision))
+  def meanAvgPrec(scoresList: Seq[Scores]): Double = {
+    val avgPrecList = scoresList.map(_.avgPrecision)
+    avgPrecList.sum / avgPrecList.length
   }
 
-  // TODO: test, create term model option
-  def getLangModelResults(lm: LanguageModel): Map[Int, Seq[String]] = {
+  def getRelevanceModelResults(m: RelevanceModel): Map[Int, Seq[String]] = {
     val queries = getQueries.toMap.mapValues(q => q.split("\\s+").toVector.map(term => PorterStemmer.stem(term)))
-    queries.mapValues(q => lm.topNDocs(q, 100))
+    queries.mapValues(q => m.topNDocs(q, 100))
   }
 
   def computeScores(queryResults: Map[Int, Seq[String]]): Map[Int, Scores] = {
     queryResults.map{ case(q, results) => (q, getScoresFromResults(q, results))}
+  }
+
+  def computeAllScores(m: RelevanceModel): Map[Int, Scores] = {
+    computeScores(getRelevanceModelResults(m))
   }
 
 

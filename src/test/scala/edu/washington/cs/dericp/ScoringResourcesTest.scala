@@ -48,15 +48,8 @@ class ScoringResourcesTest {
 
   @Test
   def testMeanAvgPrec(): Unit = {
-    val avgPrecList = List(0.4, 0.5, 0.3)
-    val MAP = ScoringResources.meanAvgPrec(avgPrecList)
-    assertEquals(1.2/3.0, MAP, 0)
-  }
-
-  @Test
-  def testMeanAvgPrecComplex(): Unit = {
     val scoresList = List(new Scores(0.0, 0.0, 0.0, 0.4), new Scores(0.0, 0.0, 0.0, 0.5))
-    val MAP = ScoringResources.meanAvgPrecComplex(scoresList)
+    val MAP = ScoringResources.meanAvgPrec(scoresList)
     val expected = 0.9 / 2.0
     assertEquals(expected, MAP, 0)
   }
