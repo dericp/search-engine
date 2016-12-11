@@ -52,7 +52,8 @@ object Main {
     while (keepQuerying) {
       println()
       println("Please enter your query:")
-      var query = StdIn.readLine().split("\\s+").map(term => PorterStemmer.stem(term.toLowerCase))
+      var query = StdIn.readLine().split("\\s+").filter(!Utils.STOP_WORDS.contains(_))
+        .map(term => PorterStemmer.stem(term.toLowerCase))
       println()
 
       println("Getting top documents...")
