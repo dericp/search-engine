@@ -3,6 +3,8 @@ package edu.washington.cs.dericp
 import java.io.{File, PrintStream, Serializable}
 import java.util.Scanner
 
+import com.github.aztek.porterstemmer.PorterStemmer
+
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
@@ -41,7 +43,6 @@ object ScoringResources {
     2 * p * r / (p + r)
   }
 
-  // TODO: (!!) REMEMBER TO BOUND THE DENOMINATOR MIN( (TP + FN), 100)
   // AP = (SUM (Precision at rank k * (1 if doc is relevant, 0 otherwise))) / MIN(truePos + falseNeg, correctResults.size)
   def avgPrec(results: List[String], correctResults: Set[String], falseNeg: Int): Double = {
     val correctResultsSet = correctResults.toSet
@@ -60,10 +61,22 @@ object ScoringResources {
     precisionSum / Math.min(truePos + falseNeg, correctResults.size).toDouble
   }
 
+  // TODO: do we need both?
   def meanAvgPrec(avgPrecList: List[Double]) = avgPrecList.sum / avgPrecList.length
 
   def meanAvgPrecComplex(scoresList: List[Scores]): Double = {
     meanAvgPrec(scoresList.map(_.avgPrecision))
+  }
+
+  // TODO: test, create term model option
+  def getLangModelResults(lm: LanguageModel): Map[Int, List[String]] = {
+    val queries = getQueries.toMap.mapValues(q => q.split("\\s+").toList.map(term => PorterStemmer.stem(term)))
+    queries.mapValues(q => lm.topNDocs(q, 100, .01))
+  }
+
+  // TODO: test
+  def computeScores(queryResults: Map[Int, List[String]]): Map[Int, Scores] = {
+    queryResults.map{ case(q, results) => (q, getScoresFromResults(q, results))}
   }
 
 
