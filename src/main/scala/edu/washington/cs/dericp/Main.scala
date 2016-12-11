@@ -57,7 +57,7 @@ object Main {
       println()
 
       println("Getting top documents...")
-      println(relevanceModel.topNDocs(query, 100).mkString(","))
+      println(relevanceModel.topNDocs(query, 100).mkString(", "))
 
       println("Would you like to enter another query? TRUE/FALSE:")
       keepQuerying = StdIn.readLine().toBoolean

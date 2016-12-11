@@ -26,7 +26,7 @@ class TermModel(val index: Map[String,Seq[DocData]], val docLength: Map[String,I
   // TODO: Returns the top
   // TODO: get list intersection
   def topNDocs(query: Seq[String], n: Int/*, shortenedDocList: Seq[String]*/): Seq[String] = {
-    val containAllQueryWords = InvertedIndex.listIntersection(query, index)
+    val containAllQueryWords = InvertedIndex.listIntersection(query, n, index)
     var shortenedDocList = docLength.keys
     println(containAllQueryWords.size)
     if (containAllQueryWords.size >= n) {
