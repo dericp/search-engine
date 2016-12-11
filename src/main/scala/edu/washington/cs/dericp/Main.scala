@@ -32,8 +32,8 @@ object Main {
 
     // TODO: figure out the other case?
     val retrievalModel = model match {
-      case "language" => new LanguageModel(invIdx, Map.empty, .01)
-      case "term" => new TermModel(invIdx, Map.empty)
+      case "LANGUAGE" => new LanguageModel(invIdx, Map.empty, .01)
+      case "TERM" => new TermModel(invIdx, Map.empty)
       case _ => new LanguageModel(invIdx, Map.empty, .01)
     }
 
@@ -50,11 +50,8 @@ object Main {
       println(results)
       println()
 
-      println("Would you like to enter another query? y/n:")
-      val response = StdIn.readLine()//.startsWith("y")
-      if (response.startsWith("n")) {
-        keepQuerying = false
-      }
+      println("Would you like to enter another query? TRUE/FALSE:")
+      keepQuerying = StdIn.readLine().toBoolean
     }
 
     // TODO: score documents

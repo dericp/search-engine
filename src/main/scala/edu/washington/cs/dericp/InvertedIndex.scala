@@ -36,8 +36,8 @@ object InvertedIndex {
     *
     * @param invIdx the inverted index
     */
-  def writeInvertedIndexToFile(invIdx: Map[String, List[DocData]]): Unit = {
-    val pw = new PrintWriter("src/main/resources/inverted-index.txt")
+  def writeInvertedIndexToFile(invIdx: Map[String, List[DocData]], filepath: String): Unit = {
+    val pw = new PrintWriter(filepath)
 
     // method writes a line to a file
     def writeLineToFile(termToDocDatas: (String, List[DocData])): Unit = {
