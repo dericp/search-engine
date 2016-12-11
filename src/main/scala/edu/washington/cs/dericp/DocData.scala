@@ -1,6 +1,4 @@
 package edu.washington.cs.dericp
-import ch.ethz.dal.tinyir.indexing.Result
-import ch.ethz.dal.tinyir.processing.XMLDocument
 
 class DocData(val docID: String, val freq: Int) extends Ordered[DocData] {
   def id() : String = {

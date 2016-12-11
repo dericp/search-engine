@@ -10,11 +10,11 @@ import scala.io.Source
 
 object InvertedIndex {
   // the minimum number of documents a term must appear in --- this helps prune typos
-  val MIN_NUM_DOCS = 5
+  //val MIN_NUM_DOCS = 5
 
-  def createInvertedIndex(filepath: String): Map[String, List[DocData]] = {
+  def createInvertedIndex(filepath: String): Map[String, Seq[DocData]] = {
     // XMLDocument stream
-    def docs = new TipsterStream(filepath).stream//.take(10000)
+    def docs = new TipsterStream(filepath).stream.take(1000)
     docs.flatMap(doc => doc.tokens.filter(!Utils.STOP_WORDS.contains(_)).map(token => (PorterStemmer.stem(token), doc.name)))
     // [(token, docID), ...] minus stop words and stems
         .groupBy(_._1)
@@ -25,10 +25,10 @@ object InvertedIndex {
         // {token -> {docID -> [docID, docID, ...], ...}, ...}
         .map{ case(docID, docIDs) => (docID, docIDs.size) }
         // {token -> {docID -> docIDCount, ...}, ...}
-        .map(tuple => new DocData(tuple._1, tuple._2)).toList.sorted)
+        .map(tuple => new DocData(tuple._1, tuple._2)).toVector.sorted)
         // {token -> [DocData1, DocData2, ...], ...}
-        // get rip of stop words and rarely occurring term
-        .filter{ case(key, value) => value.length >= MIN_NUM_DOCS }
+        // get rid of stop words and rarely occurring terms
+        //.filter{ case(key, value) => value.length >= MIN_NUM_DOCS }
   }
 
   /**
@@ -36,11 +36,11 @@ object InvertedIndex {
     *
     * @param invIdx the inverted index
     */
-  def writeInvertedIndexToFile(invIdx: Map[String, List[DocData]], filepath: String): Unit = {
+  def writeInvertedIndexToFile(invIdx: Map[String, Seq[DocData]], filepath: String): Unit = {
     val pw = new PrintWriter(filepath)
 
     // method writes a line to a file
-    def writeLineToFile(termToDocDatas: (String, List[DocData])): Unit = {
+    def writeLineToFile(termToDocDatas: (String, Seq[DocData])): Unit = {
       // write the term
       pw.print(termToDocDatas._1 + " ")
       // get the docIDs to counts
@@ -59,8 +59,8 @@ object InvertedIndex {
     * @param filepath
     * @return
     */
-  def readInvertedIndexFromFile(filepath: String) : Map[String, List[DocData]] = {
-    val invIdx = new collection.mutable.HashMap[String, List[DocData]]
+  def readInvertedIndexFromFile(filepath: String) : Map[String, Seq[DocData]] = {
+    val invIdx = new collection.mutable.HashMap[String, Seq[DocData]]
     val lines: Iterator[Array[String]] = Source.fromFile(filepath).getLines().map(l => l.split("\\s+"))
 
     // add a line from the file to the inverted index
@@ -69,7 +69,7 @@ object InvertedIndex {
         val term = line(0)
         // collection of tuples (docID, freq)
         val docIDsAndFreqs = line.drop(1).map(str => str.split(":"))
-        val docDatas = docIDsAndFreqs.map{ arr => new DocData(arr(0), arr(1).toInt) }.toList
+        val docDatas = docIDsAndFreqs.map{ arr => new DocData(arr(0), arr(1).toInt) }.toVector
         invIdx += ((term, docDatas))
       }
     }
@@ -86,7 +86,7 @@ object InvertedIndex {
     * @param invIdx
     * @return
     */
-  def listIntersection(query: List[String], invIdx: Map[String, List[DocData]]) : List[String] = {
+  def listIntersection(query: Seq[String], invIdx: Map[String, Seq[DocData]]) : Seq[String] = {
     // list of the docIDs that contain all terms in the query
     val output = scala.collection.mutable.ListBuffer.empty[String]
     // the inverted index but only with the terms in the query
@@ -147,7 +147,7 @@ object InvertedIndex {
     }
 
     // returning the final list of doc IDs with all query terms
-    output.toList
+    output.toVector
   }
 }
 

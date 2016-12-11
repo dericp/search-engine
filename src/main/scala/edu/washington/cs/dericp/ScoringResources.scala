@@ -15,7 +15,7 @@ object ScoringResources {
 
   case class Scores(precision: Double, recall: Double, f1: Double, avgPrecision: Double)
 
-  def getScoresFromResults(results: List[String], correctResults: Set[String]): Scores = {
+  def getScoresFromResults(results: Seq[String], correctResults: Set[String]): Scores = {
     val truePos = results.toSet.intersect(correctResults).size
     //println("TP: " + truePos)
     val falsePos = results.size - truePos
@@ -29,7 +29,7 @@ object ScoringResources {
     return new Scores(p, r, f1, ap)
   }
 
-  def getScoresFromResults(queryNum: Int, results: List[String]): Scores = {
+  def getScoresFromResults(queryNum: Int, results: Seq[String]): Scores = {
     val correctResults = getCorrectResults.getOrElse(queryNum, List[String]()).toSet
     getScoresFromResults(results, correctResults)
   }
@@ -47,7 +47,7 @@ object ScoringResources {
   }
 
   // AP = (SUM (Precision at rank k * (1 if doc is relevant, 0 otherwise))) / MIN(truePos + falseNeg, correctResults.size)
-  def avgPrec(results: List[String], correctResults: Set[String], falseNeg: Int): Double = {
+  def avgPrec(results: Seq[String], correctResults: Set[String], falseNeg: Int): Double = {
     val correctResultsSet = correctResults.toSet
     var precisionSum = 0.0
     var truePos = 0
@@ -65,27 +65,27 @@ object ScoringResources {
   }
 
   // TODO: do we need both?
-  def meanAvgPrec(avgPrecList: List[Double]) = avgPrecList.sum / avgPrecList.length
+  def meanAvgPrec(avgPrecList: Seq[Double]) = avgPrecList.sum / avgPrecList.length
 
-  def meanAvgPrecComplex(scoresList: List[Scores]): Double = {
+  def meanAvgPrecComplex(scoresList: Seq[Scores]): Double = {
     meanAvgPrec(scoresList.map(_.avgPrecision))
   }
 
   // TODO: test, create term model option
-  def getLangModelResults(lm: LanguageModel): Map[Int, List[String]] = {
-    val queries = getQueries.toMap.mapValues(q => q.split("\\s+").toList.map(term => PorterStemmer.stem(term)))
+  def getLangModelResults(lm: LanguageModel): Map[Int, Seq[String]] = {
+    val queries = getQueries.toMap.mapValues(q => q.split("\\s+").toVector.map(term => PorterStemmer.stem(term)))
     queries.mapValues(q => lm.topNDocs(q, 100))
   }
 
   // TODO: test
-  def computeScores(queryResults: Map[Int, List[String]]): Map[Int, Scores] = {
+  def computeScores(queryResults: Map[Int, Seq[String]]): Map[Int, Scores] = {
     queryResults.map{ case(q, results) => (q, getScoresFromResults(q, results))}
   }
 
 
   // Returns the queries to be used to test the scoring algorithms
   // In a ListBuffer of (Int, String) meaning (query #, query)
-  def getQueries: List[(Int, String)] = {
+  def getQueries: Seq[(Int, String)] = {
     val queryPairs = new ListBuffer[(Int, String)]
     val input = new Scanner(new File("src/main/resources/simple-questions-descriptions.txt"))
     while(input.hasNextLine) {
@@ -93,12 +93,12 @@ object ScoringResources {
       val query = input.nextLine()
       queryPairs.+=((num, query))
     }
-    queryPairs.toList
+    queryPairs.toVector
   }
 
   // Returns the correct documents for each query
   // In a map from query number --> Set of correct documents
-  def getCorrectResults: scala.collection.Map[Int, List[String]] = {
+  def getCorrectResults: scala.collection.Map[Int, Seq[String]] = {
     val lines = Source.fromFile("src/main/resources/simple-relevance-judgements.txt").getLines()
     val results = new collection.mutable.HashMap[Int, ListBuffer[String]]
 
@@ -113,7 +113,7 @@ object ScoringResources {
       }
     }
     lines.foreach(addResult(_))
-    results.mapValues(l => l.toList)
+    results.mapValues(l => l.toVector)
   }
 
   // creates a simplified version of "question-descriptions.txt" that has just
@@ -130,7 +130,7 @@ object ScoringResources {
       }
     }
 
-    val lines = Source.fromFile("src/main/resources/questions-descriptions.txt").getLines.toList.
+    val lines = Source.fromFile("src/main/resources/questions-descriptions.txt").getLines.toVector.
       filter(line => line.startsWith("<title>") || line.startsWith("<num>"))
     val shortenedLines = lines.map(shortenLine(_))
     val ps = new PrintStream("src/main/resources/simple-questions-descriptions.txt")

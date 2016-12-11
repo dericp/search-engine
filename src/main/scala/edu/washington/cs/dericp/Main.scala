@@ -12,50 +12,45 @@ object Main {
     println("Using " + model + " model.")
     println()
 
-    println("Please enter your query:")
-    val query = StdIn.readLine().split("\\s+").map(term => PorterStemmer.stem(term))
-    println()
-
     println("Build a new inverted index from scratch? TRUE/FALSE:")
     val newIndex = StdIn.readLine().toBoolean
-    println()
-
     println("Building inverted index...")
 
     val invIdx = {
       if (newIndex) {
         InvertedIndex.createInvertedIndex("src/main/resources/documents")
       } else {
-        InvertedIndex.readInvertedIndexFromFile("src/main/resources/inverted-index.txt")
+        InvertedIndex.readInvertedIndexFromFile("inverted-index")
       }
     }
 
+    println("Building relevance model...")
+
+    // get the document lengths
+    def docs = new TipsterStream("src/main/resources/documents").stream.take(1000)
+    val docLengths = docs.map(doc => (doc.name -> doc.tokens.length)).toMap
+
     // TODO: figure out the other case?
-    val retrievalModel = model match {
-      case "LANGUAGE" => new LanguageModel(invIdx, Map.empty, .01)
-      case "TERM" => new TermModel(invIdx, Map.empty)
-      case _ => new LanguageModel(invIdx, Map.empty, .01)
+    val relevanceModel = model match {
+      case "LANGUAGE" => new LanguageModel(invIdx, docLengths, .01)
+      case "TERM" => new TermModel(invIdx, docLengths)
+      case _ => throw new IllegalArgumentException("Invalid relevance model name. Please enter one of the options.")
     }
 
     var keepQuerying = true
 
     while (keepQuerying) {
-      // TODO: might want to delete query option from above
+      println()
       println("Please enter your query:")
-      val query = StdIn.readLine().split("\\s+").map(term => PorterStemmer.stem(term)).toList
+      var query = StdIn.readLine().split("\\s+").map(term => PorterStemmer.stem(term.toLowerCase))
       println()
 
-      // COMPUTE WITH MODEL AND PRINT RESULTS
-      val results = retrievalModel.topNDocs(query, 100)
-      println(results)
-      println()
+      println("Getting top documents...")
+      println(relevanceModel.topNDocs(query, 100).mkString(","))
 
       println("Would you like to enter another query? TRUE/FALSE:")
       keepQuerying = StdIn.readLine().toBoolean
     }
-
-    // TODO: score documents
-
   }
 }
 
