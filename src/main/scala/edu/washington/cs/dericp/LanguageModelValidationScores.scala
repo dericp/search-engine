@@ -5,7 +5,7 @@ import ch.ethz.dal.tinyir.io.TipsterStream
 import scala.io.StdIn
 
 /**
-  * Created by dericp on 12/12/16.
+  * This is for tuning the lambda value in the language model.
   */
 object LanguageModelValidationScores {
 
