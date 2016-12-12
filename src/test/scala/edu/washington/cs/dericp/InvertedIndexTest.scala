@@ -47,7 +47,7 @@ object InvertedIndexTest {
 
     val results3 = lm.topNDocs(q3, 100)
     //println(results1.toString)
-    val scores1 = ScoringResources.getScoresFromResults(56, results3)
+    val scores1 = ScoringUtils.getScoresFromResults(56, results3)
     println(scores1.precision)
     println(scores1.recall)
     println(scores1.f1)
