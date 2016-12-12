@@ -12,6 +12,10 @@ class ScoringResourcesTest {
   def results = List("0", "1", "2", "3")
   def correctResults = Set("0", "1", "4", "5")
 
+  def avgPrecResults = List("0", "1", "3", "4", "5")
+  def avgPrecShortResults = List("0", "1", "3", "4")
+  def avgPrecCorrectResults = Set("0", "3", "2", "4", "6")
+
   @Test
   def testPrecision(): Unit = {
     val p = ScoringResources.precision(4, 4)
@@ -40,9 +44,19 @@ class ScoringResourcesTest {
 
   @Test
   def testAvgPrec(): Unit = {
-    val falseNeg = correctResults.count(r => results.contains(r))
-    val AP = ScoringResources.avgPrec(results, correctResults, falseNeg)
-    val expected = 2.0 / (2.0 + falseNeg)
+    val falseNeg = avgPrecCorrectResults.count(r => !avgPrecResults.contains(r))
+    //println("false neg: " + falseNeg)
+    val AP = ScoringResources.avgPrec(avgPrecResults, avgPrecCorrectResults, falseNeg)
+    val expected = (1.0 + 0.0 + 2.0/3.0 + 3.0/4.0 + 0.0) / 5.0
+    assertEquals(expected, AP, 0)
+  }
+
+  @Test
+  def testAvgPrecShortResults(): Unit = {
+    val falseNeg = avgPrecCorrectResults.count(r => !avgPrecShortResults.contains(r))
+    //println("false neg: " + falseNeg)
+    val AP = ScoringResources.avgPrec(avgPrecShortResults, avgPrecCorrectResults, falseNeg)
+    val expected = (1.0 + 0.0 + 2.0/3.0 + 3.0/4.0 + 0.0) / 4.0
     assertEquals(expected, AP, 0)
   }
 
