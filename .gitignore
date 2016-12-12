@@ -156,4 +156,4 @@ project/boot/
 documents.zip
 
 # Ignore previously created inverted index files
-inverted-index
+inverted-index.txt
