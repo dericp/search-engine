@@ -55,8 +55,7 @@ object Main {
     while (keepQuerying) {
       println()
       println("Please enter your query:")
-      var query = StdIn.readLine().split("\\s+").filter(!Utils.STOP_WORDS.contains(_))
-        .map(term => PorterStemmer.stem(term.toLowerCase))
+      val query = Utils.getQueryTermsFromString(StdIn.readLine())
       println()
 
       println("Getting top documents...")
