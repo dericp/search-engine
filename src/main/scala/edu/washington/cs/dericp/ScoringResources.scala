@@ -57,7 +57,7 @@ object ScoringResources {
       }
     }
 
-    precisionSum / Math.min(truePos + falseNeg, correctResults.size).toDouble
+    precisionSum / Math.min(truePos + falseNeg, results.size).toDouble
   }
 
   def meanAvgPrec(scoresList: Seq[Scores]): Double = {
