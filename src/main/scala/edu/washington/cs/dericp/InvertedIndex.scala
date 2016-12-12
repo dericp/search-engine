@@ -96,8 +96,12 @@ object InvertedIndex {
 
     // case where none of the query terms show up in the documents
     if (termToDocIDsOnlyQueryTerms.isEmpty) {
+      println("set is empty!")
       return Set.empty
     }
+
+    // method to remove max term
+    //def removeMaxTerm
 
     // each terms mapped to the index we're currently looking at
     val termToCurrIdx = collection.mutable.Map() ++ termToDocIDsOnlyQueryTerms.mapValues(_ => 0)
