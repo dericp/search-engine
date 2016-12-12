@@ -65,9 +65,7 @@ object ScoringResources {
     avgPrecList.sum / avgPrecList.length
   }
 
-  def getRelevanceModelResults(m: RelevanceModel): Map[Int, Seq[String]] = {
-    val queries = getQueries//.toMap.mapValues(q => q.split("\\s+").toVector.map(term => PorterStemmer.stem(term)))
-    println(queries.toString)
+  def getRelevanceModelResults(m: RelevanceModel, queries: Map[Int, Seq[String]]): Map[Int, Seq[String]] = {
     queries.mapValues(q => m.topNDocs(q, 100))
   }
 
@@ -76,7 +74,8 @@ object ScoringResources {
   }
 
   def computeAllScores(m: RelevanceModel): Map[Int, Scores] = {
-    computeScores(getRelevanceModelResults(m))
+    val queries = getQueries
+    computeScores(getRelevanceModelResults(m, queries))
   }
 
   // TODO: think about remove chars like parens, commas, dashes, slash, &, quotes, etc (look at test queries)
