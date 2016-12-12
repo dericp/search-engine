@@ -15,6 +15,7 @@ object Main {
     println("Build a new inverted index from scratch? TRUE/FALSE:")
     val newIndex = StdIn.readLine().toBoolean
     println("Building inverted index...")
+    println()
 
     val invIdx = {
       if (newIndex) {
@@ -61,6 +62,7 @@ object Main {
       println("Getting top documents...")
       println(relevanceModel.topNDocs(query, 100).mkString(", "))
 
+      println()
       println("Would you like to enter another query? TRUE/FALSE:")
       keepQuerying = StdIn.readLine().toBoolean
     }
