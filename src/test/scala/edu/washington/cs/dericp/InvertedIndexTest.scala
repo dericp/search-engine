@@ -22,13 +22,13 @@ object InvertedIndexTest {
     val docLengths = docs.map(doc => doc.name -> doc.tokens.length).toMap
 
     val lm = new LanguageModel(b, docLengths, .01)
-//
-//    val scores = ScoringResources.computeAllScores(lm)
-//    val MAP = ScoringResources.meanAvgPrec(scores.values.toSeq)
-//
-//    println("MAP: " + MAP)
 
-    ///*
+    val scores = ScoringResources.computeAllScores(lm)
+    val MAP = ScoringResources.meanAvgPrec(scores.values.toSeq)
+
+    println("MAP: " + MAP)
+
+    /*
     // top doc = AP880215-0217
     //val q = List("Denmark", "women", "military", "pilot").map(term => PorterStemmer.stem(term))
     val q1 = List("Airbus", "subsidies", "the").map(term => PorterStemmer.stem(term))
@@ -76,7 +76,7 @@ object InvertedIndexTest {
 //    println()
 
     println(ScoringResources.meanAvgPrec(scores.values.toList))
-    //*/
+    */
   }
 
 }
