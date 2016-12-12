@@ -68,7 +68,7 @@ object TestMain {
       println("precision: " + scores.precision)
       println("recall: " + scores.recall)
       println("f1: " + scores.f1)
-      //println("avgPrec: " + scores.avgPrecision)
+      println("avgPrec: " + scores.avgPrecision)
 
       println("Would you like to enter another query? TRUE/FALSE:")
       keepQuerying = StdIn.readLine().toBoolean

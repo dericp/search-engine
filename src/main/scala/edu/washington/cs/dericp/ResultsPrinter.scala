@@ -11,6 +11,9 @@ import scala.io.Source
   */
 object ResultsPrinter {
 
+  val INV_IDX_FILEPATH = "inverted-index-tf-min-2"
+  val CUSTOM_RUN_TAG = ""
+
   def getTestQueries(): Map[Int, Seq[String]] = {
     val lines = Source.fromFile("src/main/resources/test-questions.txt").getLines.toVector
 
@@ -32,7 +35,7 @@ object ResultsPrinter {
     val queries = getTestQueries().take(1)
     val useLangModel = true
 
-    val invIndex = InvertedIndex.readInvertedIndexFromFile("src/main/resources/inverted-index")
+    val invIndex = InvertedIndex.readInvertedIndexFromFile(INV_IDX_FILEPATH)
 
     def docs = new TipsterStream("src/main/resources/documents").stream
     val docLengths = docs.map(doc => doc.name -> doc.tokens.length).toMap
@@ -42,12 +45,12 @@ object ResultsPrinter {
     if (useLangModel) {
       val lm = new LanguageModel(invIndex, docLengths, lambda)
       val results = ScoringResources.getRelevanceModelResults(lm, queries).mapValues(_.zipWithIndex)
-      val ps = new PrintStream("src/main/resources/ranking-l-13.run")
+      val ps = new PrintStream("ranking-l-13.run" + CUSTOM_RUN_TAG)
       printResults(results, ps)
     } else {
       val tm = new TermModel(invIndex, docLengths)
       val results = ScoringResources.getRelevanceModelResults(tm, queries).mapValues(_.zipWithIndex)
-      val ps = new PrintStream("src/main/resources/ranking-t-13.run")
+      val ps = new PrintStream("ranking-t-13.run" + CUSTOM_RUN_TAG)
       printResults(results, ps)
     }
 
