@@ -38,8 +38,8 @@ object Main {
     println("Building relevance model...")
 
     // get the document lengths
-    def docs = new TipsterStream("src/main/resources/documents").stream.take(1000)
-    val docLengths = docs.map(doc => (doc.name -> doc.tokens.length)).toMap
+    def docs = new TipsterStream("src/main/resources/documents").stream
+    val docLengths = docs.map(doc => doc.name -> doc.tokens.length).toMap
 
     val relevanceModel = model match {
       case "language" => new LanguageModel(invIdx, docLengths, .01)
