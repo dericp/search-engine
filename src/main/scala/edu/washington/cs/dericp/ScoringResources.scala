@@ -1,36 +1,30 @@
 package edu.washington.cs.dericp
 
-import java.io.{File, PrintStream, Serializable}
+import java.io.{File, PrintStream}
 import java.util.Scanner
-
-import com.github.aztek.porterstemmer.PorterStemmer
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-/**
-  * Created by erikawolfe on 12/6/16.
-  */
 object ScoringResources {
 
   case class Scores(precision: Double, recall: Double, f1: Double, avgPrecision: Double)
 
   def getScoresFromResults(results: Seq[String], correctResults: Set[String]): Scores = {
     val truePos = results.toSet.intersect(correctResults).size
-    //println("TP: " + truePos)
     val falsePos = results.size - truePos
-    //println("FP: " + falsePos)
     val falseNeg = correctResults.size - truePos
-    //println("FN: " + falseNeg)
+
     val p = precision(truePos, falsePos)
     val r = recall(truePos, falseNeg)
     val f1 = f1Score(p, r)
     val ap = avgPrec(results, correctResults, falseNeg)
+
     return new Scores(p, r, f1, ap)
   }
 
   def getScoresFromResults(queryNum: Int, results: Seq[String]): Scores = {
-    val correctResults = getCorrectResults.getOrElse(queryNum, List[String]()).toSet
+    val correctResults = getCorrectResults.getOrElse(queryNum, Seq[String]()).toSet
     getScoresFromResults(results, correctResults)
   }
 
@@ -48,6 +42,7 @@ object ScoringResources {
 
   // AP = (SUM (Precision at rank k * (1 if doc is relevant, 0 otherwise))) / MIN(truePos + falseNeg, correctResults.size)
   def avgPrec(results: Seq[String], correctResults: Set[String], falseNeg: Int): Double = {
+    // TODO: I'm not sure what the pont of correctResultsSet is
     val correctResultsSet = correctResults.toSet
     var precisionSum = 0.0
     var truePos = 0
@@ -61,6 +56,7 @@ object ScoringResources {
         falsePos += 1
       }
     }
+
     precisionSum / Math.min(truePos + falseNeg, correctResults.size).toDouble
   }
 
@@ -82,7 +78,6 @@ object ScoringResources {
   def computeAllScores(m: RelevanceModel): Map[Int, Scores] = {
     computeScores(getRelevanceModelResults(m))
   }
-
 
   // TODO: think about remove chars like parens, commas, dashes, slash, &, quotes, etc (look at test queries)
   // TODO: AND make sure to check these changes with inverted index
