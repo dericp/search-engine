@@ -23,16 +23,17 @@ object InvertedIndexTest {
 
     val lm = new LanguageModel(b, docLengths, .01)
 
-    val scores = ScoringResources.computeAllScores(lm)
-    val MAP = ScoringResources.meanAvgPrec(scores.values.toSeq)
+//    val scores = ScoringResources.computeAllScores(lm)
+//    val MAP = ScoringResources.meanAvgPrec(scores.values.toSeq)
+//
+//    println("MAP: " + MAP)
 
-    println("MAP: " + MAP)
 
-    /*
     // top doc = AP880215-0217
     //val q = List("Denmark", "women", "military", "pilot").map(term => PorterStemmer.stem(term))
-    val q1 = List("Airbus", "subsidies", "the").map(term => PorterStemmer.stem(term))
-    val q2 = List("South", "African", "sanctions").map(term => PorterStemmer.stem(term))
+//    val q1 = List("Airbus", "subsidies", "the").map(term => PorterStemmer.stem(term))
+//    val q2 = List("South", "African", "sanctions").map(term => PorterStemmer.stem(term))
+    val q3 = Utils.getQueryTermsFromString("Prime (Lending) Rate Moves, Predictions")
 
     //println("finding listintersection")
     //println(InvertedIndex.listIntersection(q, b))
@@ -44,25 +45,34 @@ object InvertedIndexTest {
 
     //println("done creating langmodel")
 
-    val results1 = lm.topNDocs(q1, 100)
+    val results3 = lm.topNDocs(q3, 100)
     //println(results1.toString)
-    val scores1 = ScoringResources.getScoresFromResults(51, results1)
+    val scores1 = ScoringResources.getScoresFromResults(56, results3)
     println(scores1.precision)
     println(scores1.recall)
     println(scores1.f1)
     println(scores1.avgPrecision)
     println()
 
-    val results2 = lm.topNDocs(q2, 100)
-    println(results2.toString)
-    val scores2 = ScoringResources.getScoresFromResults(52, results2)
-    println(scores2.precision)
-    println(scores2.recall)
-    println(scores2.f1)
-    println(scores2.avgPrecision)
-    println()
+//    val results1 = lm.topNDocs(q1, 100)
+//    //println(results1.toString)
+//    val scores1 = ScoringResources.getScoresFromResults(51, results1)
+//    println(scores1.precision)
+//    println(scores1.recall)
+//    println(scores1.f1)
+//    println(scores1.avgPrecision)
+//    println()
+//
+//    val results2 = lm.topNDocs(q2, 100)
+//    println(results2.toString)
+//    val scores2 = ScoringResources.getScoresFromResults(52, results2)
+//    println(scores2.precision)
+//    println(scores2.recall)
+//    println(scores2.f1)
+//    println(scores2.avgPrecision)
+//    println()
 
-    val scores = ScoringResources.computeScores(List((51, results1), (52, results2)).toMap)
+    //val scores = ScoringResources.computeScores(List((51, results1), (52, results2)).toMap)
 //    println(scores(51).precision)
 //    println(scores(51).recall)
 //    println(scores(51).f1)
@@ -75,8 +85,8 @@ object InvertedIndexTest {
 //    println(scores(52).avgPrecision)
 //    println()
 
-    println(ScoringResources.meanAvgPrec(scores.values.toList))
-    */
+    //println(ScoringResources.meanAvgPrec(scores.values.toList))
+
   }
 
 }
