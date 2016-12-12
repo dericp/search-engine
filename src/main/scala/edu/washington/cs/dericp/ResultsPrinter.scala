@@ -14,6 +14,11 @@ object ResultsPrinter {
   val INV_IDX_FILEPATH = "inverted-index-tf-min-2"
   val CUSTOM_RUN_TAG = ""
 
+  /**
+    * Reads in the test queries from the given file and returns them as a map from query ID to formatted query
+    *
+    * @return test queries
+    */
   def getTestQueries(): Map[Int, Seq[String]] = {
     val lines = Source.fromFile("src/main/resources/test-questions.txt").getLines.toVector
 
@@ -22,15 +27,34 @@ object ResultsPrinter {
     numLines.zip(titleLines).toMap.mapValues(q => Utils.getQueryTermsFromString(q))
   }
 
+  /**
+    * Prints the results of a query search to text file
+    *
+    * @param results
+    * @param ps
+    */
   def printResults(results: Map[Int, Seq[(String, Int)]], ps: PrintStream): Unit = {
-    results.foreach{ case (qNum, docList) => docList.foreach(dwi => printToFile(qNum, dwi, ps))}
+    results.foreach{ case (qNum, docList) => docList.foreach(dwi => printLineToFile(qNum, dwi, ps))}
     ps.close()
   }
 
-  def printToFile(qNum: Int, docWithIndex: (String, Int), ps: PrintStream): Unit = {
+  /**
+    * Prints a specific line of results to the text file
+    *
+    * @param qNum
+    * @param docWithIndex
+    * @param ps
+    */
+  def printLineToFile(qNum: Int, docWithIndex: (String, Int), ps: PrintStream): Unit = {
     ps.println(qNum + " " + (docWithIndex._2 + 1) + " " + docWithIndex._1)
   }
 
+  /**
+    * Runs the full process of creating an invertedIndex, a relevance model and find results for the set of
+    * test queries. It then prints the results to a text file.
+    *
+    * @param args
+    */
   def main(args: Array[String]): Unit = {
     val queries = getTestQueries().take(1)
     val useLangModel = true
