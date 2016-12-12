@@ -77,6 +77,8 @@ object InvertedIndex {
   }
 
 
+  // TODO: make sure that it only returns 0 if ALL terms don't exist or have less than n docs associated (gave 0 with STOPWORD)
+  // TODO: maybe if query is more than 4 words just trim to 4? it seems like higher queries might always need more than two runs
   /**
     * Returns a set of document IDs that contain a subset of the query terms. If the number of documents
     * cannot reach n, this method will return an empty set.
@@ -151,6 +153,7 @@ object InvertedIndex {
       listIntersection(query.filter(!_.equals(maxTerm)), n, invIdx)
     } else {
       // returning the final list of doc IDs with all query terms
+      println(query.size)
       output.toSet
     }
   }

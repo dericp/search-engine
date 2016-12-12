@@ -13,6 +13,7 @@ object InvertedIndexTest {
   def main(args: Array[String]): Unit = {
 
     //val a = InvertedIndex.createInvertedIndex("src/main/resources/documents")
+    //println(ScoringResources.getQueries.toString)
 
     val b = InvertedIndex.readInvertedIndexFromFile("src/main/resources/inverted-index")
 
@@ -23,6 +24,14 @@ object InvertedIndexTest {
       }
     }
 
+    val lm = new LanguageModel(b, c.toMap, .01)
+
+    val scores = ScoringResources.computeAllScores(lm)
+    val MAP = ScoringResources.meanAvgPrec(scores.values.toSeq)
+
+    println("MAP: " + MAP)
+
+    /*
     // top doc = AP880215-0217
     //val q = List("Denmark", "women", "military", "pilot").map(term => PorterStemmer.stem(term))
     val q1 = List("Airbus", "subsidies").map(term => PorterStemmer.stem(term))
@@ -70,7 +79,7 @@ object InvertedIndexTest {
 //    println()
 
     println(ScoringResources.meanAvgPrec(scores.values.toList))
-
+    */
   }
 
 }

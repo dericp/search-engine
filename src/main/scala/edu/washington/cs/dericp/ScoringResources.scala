@@ -70,7 +70,8 @@ object ScoringResources {
   }
 
   def getRelevanceModelResults(m: RelevanceModel): Map[Int, Seq[String]] = {
-    val queries = getQueries.toMap.mapValues(q => q.split("\\s+").toVector.map(term => PorterStemmer.stem(term)))
+    val queries = getQueries//.toMap.mapValues(q => q.split("\\s+").toVector.map(term => PorterStemmer.stem(term)))
+    println(queries.toString)
     queries.mapValues(q => m.topNDocs(q, 100))
   }
 
@@ -83,9 +84,11 @@ object ScoringResources {
   }
 
 
+  // TODO: think about remove chars like parens, commas, dashes, slash, &, quotes, etc (look at test queries)
+  // TODO: AND make sure to check these changes with inverted index
   // Returns the queries to be used to test the scoring algorithms
   // In a ListBuffer of (Int, String) meaning (query #, query)
-  def getQueries: Seq[(Int, String)] = {
+  def getQueries: Map[Int, Seq[String]] = {
     val queryPairs = new ListBuffer[(Int, String)]
     val input = new Scanner(new File("src/main/resources/simple-questions-descriptions.txt"))
     while(input.hasNextLine) {
@@ -93,7 +96,8 @@ object ScoringResources {
       val query = input.nextLine()
       queryPairs.+=((num, query))
     }
-    queryPairs.toVector
+    queryPairs.toVector.toMap.mapValues(_.split("\\s+").toSeq.filter(!Utils.STOP_WORDS.contains(_))
+      .map(term => PorterStemmer.stem(term.toLowerCase)))
   }
 
   // Returns the correct documents for each query
