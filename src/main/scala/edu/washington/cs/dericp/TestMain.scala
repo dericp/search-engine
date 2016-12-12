@@ -64,7 +64,7 @@ object TestMain {
 
       println("Which query number were you testing?")
       val queryNum = StdIn.readInt()
-      val scores = ScoringResources.getScoresFromResults(queryNum, results)
+      val scores = ScoringUtils.getScoresFromResults(queryNum, results)
       println("precision: " + scores.precision)
       println("recall: " + scores.recall)
       println("f1: " + scores.f1)

@@ -26,8 +26,8 @@ object LanguageModelValidationScores {
 
       val lm = new LanguageModel(invIdx, docLengths, lambda)
 
-      val queryNumToScores = ScoringResources.computeAllScores(lm)
-      val meanAvgPrec = ScoringResources.meanAvgPrec(queryNumToScores.values.toSeq)
+      val queryNumToScores = ScoringUtils.computeAllScores(lm)
+      val meanAvgPrec = ScoringUtils.meanAvgPrec(queryNumToScores.values.toSeq)
 
       for ((queryNum, scores) <- queryNumToScores) {
         println("Query Number: " + queryNum)

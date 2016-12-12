@@ -68,12 +68,12 @@ object ResultsPrinter {
 
     if (useLangModel) {
       val lm = new LanguageModel(invIndex, docLengths, lambda)
-      val results = ScoringResources.getRelevanceModelResults(lm, queries).mapValues(_.zipWithIndex)
+      val results = ScoringUtils.getRelevanceModelResults(lm, queries).mapValues(_.zipWithIndex)
       val ps = new PrintStream("ranking-l-13.run" + CUSTOM_RUN_TAG)
       printResults(results, ps)
     } else {
       val tm = new TermModel(invIndex, docLengths)
-      val results = ScoringResources.getRelevanceModelResults(tm, queries).mapValues(_.zipWithIndex)
+      val results = ScoringUtils.getRelevanceModelResults(tm, queries).mapValues(_.zipWithIndex)
       val ps = new PrintStream("ranking-t-13.run" + CUSTOM_RUN_TAG)
       printResults(results, ps)
     }
