@@ -7,7 +7,7 @@ import scala.io.StdIn
 /**
   * Created by dericp on 12/12/16.
   */
-class LanguageModelValidationScores {
+object LanguageModelValidationScores {
 
   val INV_IDX_FILEPATH = "inverted-index-tf-min-2"
 
