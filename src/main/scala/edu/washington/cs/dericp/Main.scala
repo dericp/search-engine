@@ -22,6 +22,7 @@ object Main {
       } else {
         println("What is the relative filepath of the saved inverted index?")
         val invIdxFilepath = StdIn.readLine()
+        println("Loading inverted index from " + invIdxFilepath + "...")
         InvertedIndex.readInvertedIndexFromFile(invIdxFilepath)
       }
     }
@@ -30,7 +31,9 @@ object Main {
       println("Would you like to save this inverted index to a file? TRUE/FALSE:")
       if (StdIn.readLine().toBoolean) {
         println("What is the relative filepath you would like to save this inverted index to?")
-        InvertedIndex.writeInvertedIndexToFile(invIdx, StdIn.readLine())
+        val filepath = StdIn.readLine()
+        println("Saving inverted index to " + filepath + "...")
+        InvertedIndex.writeInvertedIndexToFile(invIdx, filepath)
       }
     }
     println()
@@ -38,8 +41,8 @@ object Main {
     println("Building relevance model...")
 
     // get the document lengths
-    def docs = new TipsterStream("src/main/resources/documents").stream.take(1000)
-    val docLengths = docs.map(doc => (doc.name -> doc.tokens.length)).toMap
+    def docs = new TipsterStream("src/main/resources/documents").stream
+    val docLengths = docs.map(doc => doc.name -> doc.tokens.length).toMap
 
     val relevanceModel = model match {
       case "language" => new LanguageModel(invIdx, docLengths, .01)
