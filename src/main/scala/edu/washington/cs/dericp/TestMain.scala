@@ -8,7 +8,7 @@ object TestMain {
   def main(args: Array[String]): Unit = {
     // code to write the whole inverted-index to a file
 
-    println(Utils.getQueryTermsFromString("U.S. Constitution - Original Intent"))
+    println(Utils.getQueryTermsFromString("\"Downstream\" Investments by OPEC Member States"))
 
 
     /*val invIdx = InvertedIndex.createInvertedIndex("src/main/resources/documents")

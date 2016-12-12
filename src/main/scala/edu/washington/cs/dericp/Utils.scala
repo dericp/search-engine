@@ -17,7 +17,7 @@ object Utils {
 
   def getQueryTermsFromString(query: String): Seq[String] = {
     query.toLowerCase.replaceAll("[^a-z0-9.]", " ").split("\\s+")
-      .filter(!STOP_WORDS.contains(_))
+      .filter(term => !term.isEmpty && !STOP_WORDS.contains(term))
       .map(term => PorterStemmer.stem(term))
   }
 
