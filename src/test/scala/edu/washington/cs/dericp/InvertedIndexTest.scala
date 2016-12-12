@@ -17,35 +17,32 @@ object InvertedIndexTest {
 
     val b = InvertedIndex.readInvertedIndexFromFile("src/main/resources/inverted-index")
 
-    val c = mutable.Map.empty[String, Int]
-    for ((term, l) <- b) {
-      for (dd <- l) {
-        c(dd.id()) = c.getOrElse(dd.id(), 0) + dd.freq
-      }
-    }
 
-    val lm = new LanguageModel(b, c.toMap, .01)
+    def docs = new TipsterStream("src/main/resources/documents").stream
+    val docLengths = docs.map(doc => doc.name -> doc.tokens.length).toMap
 
-    val scores = ScoringResources.computeAllScores(lm)
-    val MAP = ScoringResources.meanAvgPrec(scores.values.toSeq)
+    val lm = new LanguageModel(b, docLengths, .01)
+//
+//    val scores = ScoringResources.computeAllScores(lm)
+//    val MAP = ScoringResources.meanAvgPrec(scores.values.toSeq)
+//
+//    println("MAP: " + MAP)
 
-    println("MAP: " + MAP)
-
-    /*
+    ///*
     // top doc = AP880215-0217
     //val q = List("Denmark", "women", "military", "pilot").map(term => PorterStemmer.stem(term))
-    val q1 = List("Airbus", "subsidies").map(term => PorterStemmer.stem(term))
+    val q1 = List("Airbus", "subsidies", "the").map(term => PorterStemmer.stem(term))
     val q2 = List("South", "African", "sanctions").map(term => PorterStemmer.stem(term))
 
     //println("finding listintersection")
     //println(InvertedIndex.listIntersection(q, b))
 
     //println(b(PorterStemmer.stem("society")).toString)
-    println("creating langmodel")
+    //println("creating langmodel")
 
-    val lm = new LanguageModel(b, c.toMap, .01)
+    //val lm = new LanguageModel(b, c.toMap, .01)
 
-    println("done creating langmodel")
+    //println("done creating langmodel")
 
     val results1 = lm.topNDocs(q1, 100)
     //println(results1.toString)
@@ -79,7 +76,7 @@ object InvertedIndexTest {
 //    println()
 
     println(ScoringResources.meanAvgPrec(scores.values.toList))
-    */
+    //*/
   }
 
 }
