@@ -45,8 +45,7 @@ object ScoringUtils {
 
   // avgPrec = (SUM (Precision at rank k * (1 if doc is relevant, 0 otherwise))) / MIN(truePos + falseNeg, correctResults.size)
   def avgPrec(results: Seq[String], correctResults: Set[String], falseNeg: Int): Double = {
-    // TODO: I'm not sure what the pont of correctResultsSet is
-    val correctResultsSet = correctResults.toSet
+    val correctResultsSet = correctResults
     var precisionSum = 0.0
     var truePos = 0
     var falsePos = 0
