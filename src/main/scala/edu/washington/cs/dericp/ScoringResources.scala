@@ -64,27 +64,31 @@ object ScoringResources {
     precisionSum / Math.min(truePos + falseNeg, correctResults.size).toDouble
   }
 
-  // TODO: do we need both?
-  def meanAvgPrec(avgPrecList: Seq[Double]) = avgPrecList.sum / avgPrecList.length
-
-  def meanAvgPrecComplex(scoresList: Seq[Scores]): Double = {
-    meanAvgPrec(scoresList.map(_.avgPrecision))
+  def meanAvgPrec(scoresList: Seq[Scores]): Double = {
+    val avgPrecList = scoresList.map(_.avgPrecision)
+    avgPrecList.sum / avgPrecList.length
   }
 
-  // TODO: test, create term model option
-  def getLangModelResults(lm: LanguageModel): Map[Int, Seq[String]] = {
-    val queries = getQueries.toMap.mapValues(q => q.split("\\s+").toVector.map(term => PorterStemmer.stem(term)))
-    queries.mapValues(q => lm.topNDocs(q, 100))
+  def getRelevanceModelResults(m: RelevanceModel): Map[Int, Seq[String]] = {
+    val queries = getQueries//.toMap.mapValues(q => q.split("\\s+").toVector.map(term => PorterStemmer.stem(term)))
+    println(queries.toString)
+    queries.mapValues(q => m.topNDocs(q, 100))
   }
 
   def computeScores(queryResults: Map[Int, Seq[String]]): Map[Int, Scores] = {
     queryResults.map{ case(q, results) => (q, getScoresFromResults(q, results))}
   }
 
+  def computeAllScores(m: RelevanceModel): Map[Int, Scores] = {
+    computeScores(getRelevanceModelResults(m))
+  }
 
+
+  // TODO: think about remove chars like parens, commas, dashes, slash, &, quotes, etc (look at test queries)
+  // TODO: AND make sure to check these changes with inverted index
   // Returns the queries to be used to test the scoring algorithms
   // In a ListBuffer of (Int, String) meaning (query #, query)
-  def getQueries: Seq[(Int, String)] = {
+  def getQueries: Map[Int, Seq[String]] = {
     val queryPairs = new ListBuffer[(Int, String)]
     val input = new Scanner(new File("src/main/resources/simple-questions-descriptions.txt"))
     while(input.hasNextLine) {
@@ -92,7 +96,8 @@ object ScoringResources {
       val query = input.nextLine()
       queryPairs.+=((num, query))
     }
-    queryPairs.toVector
+    queryPairs.toVector.toMap.mapValues(_.split("\\s+").toSeq.filter(!Utils.STOP_WORDS.contains(_))
+      .map(term => PorterStemmer.stem(term.toLowerCase)))
   }
 
   // Returns the correct documents for each query
