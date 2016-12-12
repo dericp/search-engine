@@ -5,10 +5,22 @@ import ch.ethz.dal.tinyir.io.TipsterStream
 import com.github.aztek.porterstemmer.PorterStemmer
 import scala.io.Source
 
+/**
+  * This object holds all the methods needed to create, write, and read an inverted index. It also
+  * allows for a list intersection to be performed on an inverted index.
+  */
 object InvertedIndex {
   // the minimum number of documents a term must appear in --- this helps prune typos
   val MIN_NUM_OCCURRENCES = 2
 
+  /**
+    * Create an inverted index that is a map from term to a sequence of DocData objects
+    * that represents the documents that contain the term.
+    *
+    * @param filepath the folder that contains the zipped documents collection that can
+    *                 be read into a TipsterStream
+    * @return the inverted index
+    */
   def createInvertedIndex(filepath: String): Map[String, Seq[DocData]] = {
     // XMLDocument stream
     def docs = new TipsterStream(filepath).stream//.take(1000)
@@ -26,8 +38,6 @@ object InvertedIndex {
         // {token -> {docID -> docIDCount, ...}, ...}
         .map(tuple => new DocData(tuple._1, tuple._2)).toVector.sorted)
         // {token -> [DocData1, DocData2, ...], ...}
-        // get rid of stop words and rarely occurring terms
-        //.filter{ case(key, value) => value.length >= MIN_NUM_DOCS }
   }
 
   /**
@@ -55,8 +65,9 @@ object InvertedIndex {
   /**
     * Reads an inverted index from a file.
     *
-    * @param filepath
-    * @return
+    * @param filepath the filepath of the inverted-index which should have been generated using
+    *                 writeInvertedIndex
+    * @return the inverted index
     */
   def readInvertedIndexFromFile(filepath: String) : Map[String, Seq[DocData]] = {
     val invIdx = new collection.mutable.HashMap[String, Seq[DocData]]
@@ -79,31 +90,26 @@ object InvertedIndex {
   }
 
 
-  // TODO: make sure that it only returns 0 if ALL terms don't exist or have less than n docs associated (gave 0 with STOPWORD)
-  // TODO: maybe if query is more than 4 words just trim to 4? it seems like higher queries might always need more than two runs
   /**
-    * Returns a set of document IDs that contain a subset of the query terms. If the number of documents
-    * cannot reach n, this method will return an empty set.
+    * Returns a set of document IDs that contain at least a subset of the query terms.
+    * If the number of documents returned cannot reach n, this method will return an empty set.
     *
-    * @param query
-    * @param invIdx
-    * @return
+    * @param query the query terms
+    * @param invIdx the inverted index that the list intersection will be performed on
+    * @return the set of document IDs that contain at least a subset of the query
     */
   def listIntersection(query: Seq[String], n: Int, invIdx: Map[String, Seq[DocData]]): Set[String] = {
     // list of the docIDs that contain all terms in the query
     val output = scala.collection.mutable.HashSet.empty[String]
     // the inverted index but only with the terms in the query
     val termToDocIDsOnlyQueryTerms: Map[String, Seq[String]] =
-      invIdx.filter{ case(term, _) => query.contains(term) }.mapValues(docDatas => docDatas.map(_.id()).toVector)
+      invIdx.filter{ case(term, _) => query.contains(term) }.mapValues(docDatas => docDatas.map(_.docID).toVector)
 
     // case where none of the query terms show up in the documents
     if (termToDocIDsOnlyQueryTerms.isEmpty) {
       println("set is empty!")
       return Set.empty
     }
-
-    // method to remove max term
-    //def removeMaxTerm
 
     // each terms mapped to the index we're currently looking at
     val termToCurrIdx = collection.mutable.Map() ++ termToDocIDsOnlyQueryTerms.mapValues(_ => 0)
@@ -138,7 +144,6 @@ object InvertedIndex {
       // look at the current doc for each term
       val termToCurrDocID = termToCurrIdx.map{ case(term, index) => (term, termToDocIDsOnlyQueryTerms(term)(index)) }
       val termWithLowestIdx = termToCurrDocID.foldRight(("", "ZZZZZZZZZZZZZZZ"))(min)._1
-      // TODO: need to handle case where term isn't in any documents
       val docIDWithLowestIdx = termToCurrDocID(termWithLowestIdx)
       val docIDWithHighestIdx = termToCurrDocID(termToCurrDocID.foldRight(("", ""))(max)._1)
 
@@ -164,4 +169,3 @@ object InvertedIndex {
     }
   }
 }
-
