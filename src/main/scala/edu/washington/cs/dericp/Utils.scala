@@ -1,17 +1,11 @@
 package edu.washington.cs.dericp
 
 import breeze.linalg.DenseVector
-import ch.ethz.dal.tinyir.processing.{Document, XMLDocument}
+import ch.ethz.dal.tinyir.processing.XMLDocument
 import com.github.aztek.porterstemmer.PorterStemmer
 
 import scala.io.Source
 
-/**
-  * Created by erikawolfe on 12/3/16.
-  *
-  * TODO: Make sure we need all of these methods
-  *
-  */
 object Utils {
   val STOP_WORDS = Source.fromFile("src/main/resources/stop-words.txt").getLines.toSet
 
