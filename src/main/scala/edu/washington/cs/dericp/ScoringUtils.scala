@@ -6,7 +6,10 @@ import java.util.Scanner
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-object ScoringResources {
+/**
+  * Scoring utility class for calculating scores and stats.
+  */
+object ScoringUtils {
 
   case class Scores(precision: Double, recall: Double, f1: Double, avgPrecision: Double)
 
@@ -40,7 +43,7 @@ object ScoringResources {
     2 * p * r / (p + r)
   }
 
-  // AP = (SUM (Precision at rank k * (1 if doc is relevant, 0 otherwise))) / MIN(truePos + falseNeg, correctResults.size)
+  // avgPrec = (SUM (Precision at rank k * (1 if doc is relevant, 0 otherwise))) / MIN(truePos + falseNeg, correctResults.size)
   def avgPrec(results: Seq[String], correctResults: Set[String], falseNeg: Int): Double = {
     // TODO: I'm not sure what the pont of correctResultsSet is
     val correctResultsSet = correctResults.toSet
@@ -78,8 +81,6 @@ object ScoringResources {
     computeScores(getRelevanceModelResults(m, queries))
   }
 
-  // TODO: think about remove chars like parens, commas, dashes, slash, &, quotes, etc (look at test queries)
-  // TODO: AND make sure to check these changes with inverted index
   // Returns the queries to be used to test the scoring algorithms
   // In a ListBuffer of (Int, String) meaning (query #, query)
   def getQueries: Map[Int, Seq[String]] = {
