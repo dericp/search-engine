@@ -5,6 +5,10 @@ import ch.ethz.dal.tinyir.io.TipsterStream
 import com.github.aztek.porterstemmer.PorterStemmer
 import scala.io.Source
 
+/**
+  * This object holds all the methods needed to create, write, and read an inverted index. It also
+  * allows for a list intersection to be performed on an inverted index.
+  */
 object InvertedIndex {
   // the minimum number of documents a term must appear in --- this helps prune typos
   val MIN_NUM_OCCURRENCES = 2
@@ -99,7 +103,7 @@ object InvertedIndex {
     val output = scala.collection.mutable.HashSet.empty[String]
     // the inverted index but only with the terms in the query
     val termToDocIDsOnlyQueryTerms: Map[String, Seq[String]] =
-      invIdx.filter{ case(term, _) => query.contains(term) }.mapValues(docDatas => docDatas.map(_.id()).toVector)
+      invIdx.filter{ case(term, _) => query.contains(term) }.mapValues(docDatas => docDatas.map(_.docID).toVector)
 
     // case where none of the query terms show up in the documents
     if (termToDocIDsOnlyQueryTerms.isEmpty) {

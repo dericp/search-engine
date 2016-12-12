@@ -1,12 +1,7 @@
 package edu.washington.cs.dericp
 
-import breeze.util.TopK
-
 import scala.math.log
 
-/**
-  * Created by Isa on 11/27/2016.
-  */
 class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[String,Int], lambda: Double)
   extends RelevanceModel {
 
@@ -18,7 +13,7 @@ class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[St
     * @return matching DocData
     */
   def getDocDataFromList(doc: String, list: Seq[DocData]) : DocData = {
-    val filtered = list.filter(dd => dd.id() == doc)
+    val filtered = list.filter(dd => dd.docID == doc)
     // technically should always work bc id should only exist once, but be careful
     filtered.head
   }
@@ -58,7 +53,7 @@ class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[St
     * @return P(q|d)
     */
   def findLogPQDSmooth(query: Seq[String], doc: String, lambda: Double) : Double = {
-    val dqIntersection = query.filter(w => !index.getOrElse(w, List.empty).filter(a => a.id() == doc).isEmpty)
+    val dqIntersection = query.filter(w => !index.getOrElse(w, List.empty).filter(a => a.docID == doc).isEmpty)
     val termProbs = dqIntersection.map(w => log(1 + ((1 - lambda) / lambda) * (findPWD(w, doc) / findPW(w)))).sum
     termProbs + log(lambda)
   }
