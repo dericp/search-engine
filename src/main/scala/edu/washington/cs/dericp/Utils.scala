@@ -2,6 +2,7 @@ package edu.washington.cs.dericp
 
 import breeze.linalg.DenseVector
 import ch.ethz.dal.tinyir.processing.{Document, XMLDocument}
+import com.github.aztek.porterstemmer.PorterStemmer
 
 import scala.io.Source
 
@@ -13,6 +14,12 @@ import scala.io.Source
   */
 object Utils {
   val STOP_WORDS = Source.fromFile("src/main/resources/stop-words.txt").getLines.toSet
+
+  def getQueryTermsFromString(query: String): Seq[String] = {
+    query.toLowerCase.replaceAll("[^a-z0-9.]", " ").split("\\s+")
+      .filter(!STOP_WORDS.contains(_))
+      .map(term => PorterStemmer.stem(term))
+  }
 
 
 

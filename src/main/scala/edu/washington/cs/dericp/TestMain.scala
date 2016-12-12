@@ -8,8 +8,8 @@ object TestMain {
   def main(args: Array[String]): Unit = {
     // code to write the whole inverted-index to a file
 
-    val invIdx = InvertedIndex.readInvertedIndexFromFile("src/main/resources/inverted-index")
-    println("finished reading in inverted index")
+    println(Utils.getQueryTermsFromString("U.S. Constitution - Original Intent"))
+
 
     /*val invIdx = InvertedIndex.createInvertedIndex("src/main/resources/documents")
     println("finished creating index")

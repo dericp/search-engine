@@ -96,8 +96,7 @@ object ScoringResources {
       val query = input.nextLine()
       queryPairs.+=((num, query))
     }
-    queryPairs.toVector.toMap.mapValues(_.split("[\\s/-]+").toSeq.filter(!Utils.STOP_WORDS.contains(_))
-      .map(term => term.replaceAll("[^a-zA-Z0-9]", "")).filter(!_.isEmpty).map(term => PorterStemmer.stem(term.toLowerCase)))
+    queryPairs.toVector.toMap.mapValues(Utils.getQueryTermsFromString(_))
   }
 
   // Returns the correct documents for each query
