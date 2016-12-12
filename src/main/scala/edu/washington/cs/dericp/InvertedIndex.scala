@@ -7,7 +7,7 @@ import scala.io.Source
 
 object InvertedIndex {
   // the minimum number of documents a term must appear in --- this helps prune typos
-  //val MIN_NUM_DOCS = 5
+  val MIN_NUM_OCCURRENCES = 2
 
   def createInvertedIndex(filepath: String): Map[String, Seq[DocData]] = {
     // XMLDocument stream
@@ -16,6 +16,8 @@ object InvertedIndex {
     // [(token, docID), ...] minus stop words and stems
         .groupBy(_._1)
         // {token -> [(token, docID), ...], ...}
+        .filter(_._2.size >= MIN_NUM_OCCURRENCES)
+        // make sure the term isn't a typo
         .mapValues(_.map(tuple => tuple._2)
         // {token -> [docID, ...], ...}
         .groupBy(identity)
