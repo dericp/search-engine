@@ -1,43 +1,77 @@
 package edu.washington.cs.dericp
 
 import ch.ethz.dal.tinyir.io.TipsterStream
-import com.github.aztek.porterstemmer.PorterStemmer
+
+import scala.io.StdIn
 
 object TestMain {
 
   def main(args: Array[String]): Unit = {
-    // code to write the whole inverted-index to a file
+    println("Which relevance model would you like to use? LANGUAGE or TERM:")
+    val model = StdIn.readLine().toLowerCase
+    println("Using " + model + " model.")
+    println()
 
-    println(Utils.getQueryTermsFromString("\"Downstream\" Investments by OPEC Member States"))
+    println("Build a new inverted index from scratch? TRUE/FALSE:")
+    val newIndex = StdIn.readLine().toBoolean
+    println("Building inverted index...")
 
+    val invIdx = {
+      if (newIndex) {
+        InvertedIndex.createInvertedIndex("src/main/resources/documents")
+      } else {
+        println("What is the relative filepath of the saved inverted index?")
+        val invIdxFilepath = StdIn.readLine()
+        println("Loading inverted index from " + invIdxFilepath + "...")
+        InvertedIndex.readInvertedIndexFromFile(invIdxFilepath)
+      }
+    }
 
-    /*val invIdx = InvertedIndex.createInvertedIndex("src/main/resources/documents")
-    println("finished creating index")
-    InvertedIndex.writeInvertedIndexToFile(invIdx)*/
+    if (newIndex) {
+      println("Would you like to save this inverted index to a file? TRUE/FALSE:")
+      if (StdIn.readLine().toBoolean) {
+        println("What is the relative filepath you would like to save this inverted index to?")
+        val filepath = StdIn.readLine()
+        println("Saving inverted index to " + filepath + "...")
+        InvertedIndex.writeInvertedIndexToFile(invIdx, filepath)
+      }
+    }
+    println()
 
-    //println("finished building index")
+    println("Building relevance model...")
 
-    //val shortDocList = InvertedIndex.listIntersection(List("hens"), invIdx)
+    // get the document lengths
+    def docs = new TipsterStream("src/main/resources/documents").stream
+    val docLengths = docs.map(doc => doc.name -> doc.tokens.length).toMap
 
-    //println(shortDocList)
+    val relevanceModel = model match {
+      case "language" => new LanguageModel(invIdx, docLengths, .01)
+      case "term" => new TermModel(invIdx, docLengths)
+      case _ => throw new IllegalArgumentException("Invalid relevance model name. Please enter one of the options.")
+    }
 
-    ///////// INVERTED INDEX USING TERM MODEL TESTING
-    //    val docLengths = docs.map(doc => (doc.name -> doc.tokens.length)).toMap
-    //    val termModel = new TermModel(invInd, docLengths)
-    //
-    //    // common words: society, cages, 000
-    //    val doc1 = docs(0)
-    //    // common words: his, george, hampshire, dole, buckley
-    //    val doc2 = docs(1)
-    //    println("doc1 name: " + doc1.name)
-    //
-    //    // val query = List("his", "hampshire", "dole", "buckley")
-    //    val query = List("society", "cages", "000")
-    //
-    //    // println("score 1 (should be low): " + termModel.tfIdfScore(query, doc1.name))
-    //    // println("score 2 (should be higher): " + termModel.tfIdfScore(query, doc2.name))
-    //
-    //    println(termModel.topNDocs(query, 15))
+    var keepQuerying = true
+
+    while (keepQuerying) {
+      println()
+      println("Please enter your query:")
+      val query = Utils.getQueryTermsFromString(StdIn.readLine())
+      println()
+
+      println("Getting top documents...")
+      val results = relevanceModel.topNDocs(query, 100)
+      println(results.mkString(", "))
+
+      println("Which query number were you testing?")
+      val queryNum = StdIn.readInt()
+      val scores = ScoringResources.getScoresFromResults(queryNum, results)
+      println("precision: " + scores.precision)
+      println("recall: " + scores.recall)
+      println("f1: " + scores.f1)
+      //println("avgPrec: " + scores.avgPrecision)
+
+      println("Would you like to enter another query? TRUE/FALSE:")
+      keepQuerying = StdIn.readLine().toBoolean
+    }
   }
-
 }
