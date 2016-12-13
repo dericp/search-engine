@@ -2,12 +2,10 @@ package edu.washington.cs.dericp
 
 import scala.math.log
 
-class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[String,Int], lambda: Double)
+class LanguageModel(val index: Map[String, Seq[DocData]], val originalDocLengths: Map[String,Int])
   extends RelevanceModel {
-  def lambda(docID: String): Double = {
-    log(docLengths(docID)).toDouble / 25.0
-  }
-
+  val docLengths = originalDocLengths.mapValues(_ + 200)
+  val LAMBDA = 0.1
   /**
     * Takes in a docID and a list of DocData objects and returns the DocData containing the matching the docID
     *
@@ -52,13 +50,12 @@ class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[St
     *
     * @param query
     * @param doc
-    * @param lambda
     * @return P(q|d)
     */
-  def findLogPQDSmooth(query: Seq[String], doc: String, lambda: Double) : Double = {
+  def findLogPQDSmooth(query: Seq[String], doc: String) : Double = {
     val dqIntersection = query.filter(w => !index.getOrElse(w, List.empty).filter(a => a.docID == doc).isEmpty)
-    val termProbs = dqIntersection.map(w => log(1 + ((1 - lambda) / lambda) * (findPWD(w, doc) / findPW(w)))).sum
-    termProbs + log(lambda)
+    val termProbs = dqIntersection.map(w => log(1 + ((1 - LAMBDA) / LAMBDA) * (findPWD(w, doc) / findPW(w)))).sum
+    termProbs + log(LAMBDA)
   }
 
   /**
@@ -74,7 +71,7 @@ class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[St
     if (!trimmedIndex.isEmpty) {
       docsToSearch = docsToSearch.filter(d => trimmedIndex.contains(d))
     }
-    val pdqs = docsToSearch.map(d => (d, findLogPQDSmooth(query, d, lambda(d)))).toIndexedSeq
+    val pdqs = docsToSearch.map(d => (d, findLogPQDSmooth(query, d))).toIndexedSeq
     pdqs.sortBy(-_._2).take(n).map(_._1)
   }
 
