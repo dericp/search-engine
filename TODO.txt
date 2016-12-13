@@ -1,8 +1,8 @@
-test lambda values
-create output files
-make sure term model is working well
-streaming stuff?...
-normalize tf-idf by max tf?
-change lambda value based on doc length?
+test lambda values - change lambda value based on doc length?
 combine LanguageModelValidationScores and TermModelValidationScores
 --> Make it available in main to print output file / scores??
+remove all print statements
+
+write up
+run streaming stuff?
+create output files

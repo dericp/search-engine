@@ -164,7 +164,6 @@ object InvertedIndex {
       listIntersection(query.filter(!_.equals(maxTerm)), n, invIdx)
     } else {
       // returning the final list of doc IDs with all query terms
-      // println(query.size)
       output.toSet
     }
   }
