@@ -21,7 +21,7 @@ object Main {
 
     // create the relevance model
     val relevanceModel = model match {
-      case "language" => new LanguageModel(invIdx, docLengths, .01)
+      case "language" => new LanguageModel(invIdx, docLengths)
       case "term" => new TermModel(invIdx, docLengths)
       case _ => throw new IllegalArgumentException("Invalid relevance model name. Please enter one of the options.")
     }
