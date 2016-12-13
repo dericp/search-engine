@@ -107,7 +107,6 @@ object InvertedIndex {
 
     // case where none of the query terms show up in the documents
     if (termToDocIDsOnlyQueryTerms.isEmpty) {
-      println("set is empty!")
       return Set.empty
     }
 
