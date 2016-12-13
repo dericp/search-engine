@@ -54,34 +54,17 @@ object ResultsPrinter {
     * Runs the full process of creating an invertedIndex, a relevance model and find results for the set of
     * test queries. It then prints the results to a text file.
     *
-    * @param args
+    * @param invertedIndex
+    * @param model term model or language model
+    * @param modelLabel: "l" if model is a language model, "t" if it is a term model
+    * @param docLengths: map from doc ID to doc length
     */
-  def main(args: Array[String]): Unit = {
+  def createResultsFile(invertedIndex: Map[String, Seq[DocData]], model: RelevanceModel, modelLabel: Char, docLengths: Map[String, Int]): Unit = {
+    println("Creating results file")
     val queries = ListMap(getTestQueries().toSeq.sortBy(_._1):_*)
-    println("Use language model or term model?  (LANG / TERM)")
-    val modelType = StdIn.readLine()
-
-    val invIndex = InvertedIndex.readInvertedIndexFromFile(INV_IDX_FILEPATH)
-
-    def docs = new TipsterStream("src/main/resources/documents").stream
-    val docLengths = docs.map(doc => doc.name -> doc.tokens.length).toMap
-
-    val lambda = .01
-
-    if (modelType.equalsIgnoreCase("LANG")) {
-      val lm = new LanguageModel(invIndex, docLengths, lambda)
-      val results = ScoringUtils.getRelevanceModelResults(lm, queries).mapValues(_.zipWithIndex)
-      val ps = new PrintStream("ranking-l-13.run" + CUSTOM_RUN_TAG)
-      printResults(results, ps)
-    } else if (modelType.equalsIgnoreCase("TERM")) {
-      val tm = new TermModel(invIndex, docLengths)
-      val results = ScoringUtils.getRelevanceModelResults(tm, queries).mapValues(_.zipWithIndex)
-      val ps = new PrintStream("ranking-t-13.run" + CUSTOM_RUN_TAG)
-      printResults(results, ps)
-    } else {
-      throw new IllegalArgumentException("Invalid relevance model name. Please enter one of the options.")
-    }
-
+    val results = ScoringUtils.getRelevanceModelResults(model, queries).mapValues(_.zipWithIndex)
+    val ps = new PrintStream("ranking-" + modelLabel + "-13.run")
+    printResults(results, ps)
+    println("Results file created")
   }
-
 }
