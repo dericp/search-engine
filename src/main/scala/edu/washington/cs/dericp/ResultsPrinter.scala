@@ -59,7 +59,6 @@ object ResultsPrinter {
   def main(args: Array[String]): Unit = {
     val queries = ListMap(getTestQueries().toSeq.sortBy(_._1):_*)
     println("Use language model or term model?  (LANG / TERM)")
-
     val modelType = StdIn.readLine()
 
     val invIndex = InvertedIndex.readInvertedIndexFromFile(INV_IDX_FILEPATH)
