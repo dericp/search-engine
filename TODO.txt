@@ -1,6 +1,3 @@
-combine LanguageModelValidationScores and TermModelValidationScores
-
 write up
-run streaming stuff?
 create output files
 readme

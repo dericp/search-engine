@@ -13,7 +13,6 @@ import scala.io.{Source, StdIn}
 object ResultsPrinter {
 
   val INV_IDX_FILEPATH = "inverted-index-tf-min-2"
-  val CUSTOM_RUN_TAG = ""
 
   /**
     * Reads in the test queries from the given file and returns them as a map from query ID to formatted query
