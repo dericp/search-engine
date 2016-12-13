@@ -69,11 +69,8 @@ class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[St
     * @return search results
     */
   def topNDocs(query: Seq[String], n: Int): Seq[String] = {
-    println("begin trimming index")
     val trimmedIndex = InvertedIndex.listIntersection(query, n, index)
     var docsToSearch = docLengths.keys
-    println(query.toString)
-    println(trimmedIndex.size)
     if (!trimmedIndex.isEmpty) {
       docsToSearch = docsToSearch.filter(d => trimmedIndex.contains(d))
     }
