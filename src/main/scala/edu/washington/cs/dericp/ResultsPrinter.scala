@@ -4,6 +4,7 @@ import java.io.PrintStream
 
 import ch.ethz.dal.tinyir.io.TipsterStream
 
+import scala.collection.immutable.ListMap
 import scala.io.Source
 
 /**
@@ -56,7 +57,8 @@ object ResultsPrinter {
     * @param args
     */
   def main(args: Array[String]): Unit = {
-    val queries = getTestQueries()
+    val queries = ListMap(getTestQueries().toSeq.sortBy(_._1):_*)
+    println(queries)
     val useLangModel = false
 
     val invIndex = InvertedIndex.readInvertedIndexFromFile(INV_IDX_FILEPATH)

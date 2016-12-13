@@ -2,9 +2,11 @@ package edu.washington.cs.dericp
 
 import scala.math.log
 
-class LanguageModel(val index: Map[String, Seq[DocData]], val originalDocLengths: Map[String,Int], lambda: Double)
+class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[String,Int], lambda: Double)
   extends RelevanceModel {
-  val docLengths = originalDocLengths.mapValues(_ + 200)
+  def lambda(docID: String): Double = {
+    log(docLengths(docID)).toDouble / 25.0
+  }
 
   /**
     * Takes in a docID and a list of DocData objects and returns the DocData containing the matching the docID
@@ -75,7 +77,7 @@ class LanguageModel(val index: Map[String, Seq[DocData]], val originalDocLengths
     if (!trimmedIndex.isEmpty) {
       docsToSearch = docsToSearch.filter(d => trimmedIndex.contains(d))
     }
-    val pdqs = docsToSearch.map(d => (d, findLogPQDSmooth(query, d, lambda))).toIndexedSeq
+    val pdqs = docsToSearch.map(d => (d, findLogPQDSmooth(query, d, lambda(d)))).toIndexedSeq
     pdqs.sortBy(-_._2).take(n).map(_._1)
   }
 
