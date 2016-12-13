@@ -18,7 +18,8 @@ class TermModel(val index: Map[String,Seq[DocData]], val docLength: Map[String,I
 
   // Using simple scoring - sum of tf-idf scores of each query word, log of tf
   def tfIdfScore(query: Seq[String], docID: String): Double = {
-    val ltf = query.filter(term => index.contains(term)).map( term => term -> Math.log(1 + index(term).find(_.docID == docID).getOrElse(new DocData("0", 0)).freq)).toMap
+    val ltf = query.filter(term => index.contains(term)).map( term => term -> Math.log(1 + index(term).
+      find(_.docID == docID).getOrElse(new DocData("0", 0)).freq)).toMap
     ltf.map{ case(term, ltf) => ltf * idf.getOrElse(term, 0.0) }.sum
   }
 

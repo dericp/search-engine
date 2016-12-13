@@ -9,7 +9,7 @@ import scala.io.StdIn
   */
 object LanguageModelValidationScores {
 
-  val INV_IDX_FILEPATH = "inverted-index-tf-min-2"
+  val INV_IDX_FILEPATH = "src/main/resources/inverted-index-tf-min-2"
 
   def main(args: Array[String]): Unit = {
 

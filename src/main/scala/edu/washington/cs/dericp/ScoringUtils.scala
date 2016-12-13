@@ -44,7 +44,7 @@ object ScoringUtils {
     2 * p * r / (p + r)
   }
 
-  // avgPrec = (SUM (Precision at rank k * (1 if doc is relevant, 0 otherwise))) / MIN(truePos + falseNeg, correctResults.size)
+  // avgPrec = (SUM (Precision at rank k * (1 if doc is relevant, 0 otherwise))) / MIN(truePos + falseNeg, results.size)
   def avgPrec(results: Seq[String], correctResults: Set[String], falseNeg: Int): Double = {
     val correctResultsSet = correctResults
     var precisionSum = 0.0

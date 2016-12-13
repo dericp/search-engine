@@ -2,8 +2,9 @@ package edu.washington.cs.dericp
 
 import scala.math.log
 
-class LanguageModel(val index: Map[String, Seq[DocData]], val docLengths: Map[String,Int], lambda: Double)
+class LanguageModel(val index: Map[String, Seq[DocData]], val originalDocLengths: Map[String,Int], lambda: Double)
   extends RelevanceModel {
+  val docLengths = originalDocLengths.mapValues(_ + 200)
 
   /**
     * Takes in a docID and a list of DocData objects and returns the DocData containing the matching the docID
