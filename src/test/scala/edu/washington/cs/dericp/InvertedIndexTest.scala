@@ -21,7 +21,7 @@ object InvertedIndexTest {
     def docs = new TipsterStream("src/main/resources/documents").stream
     val docLengths = docs.map(doc => doc.name -> doc.tokens.length).toMap
 
-    val lm = new LanguageModel(b, docLengths, .01)
+    val lm = new TermModel(b, docLengths)
 
 //    val scores = ScoringResources.computeAllScores(lm)
 //    val MAP = ScoringResources.meanAvgPrec(scores.values.toSeq)
@@ -33,7 +33,7 @@ object InvertedIndexTest {
     //val q = List("Denmark", "women", "military", "pilot").map(term => PorterStemmer.stem(term))
 //    val q1 = List("Airbus", "subsidies", "the").map(term => PorterStemmer.stem(term))
 //    val q2 = List("South", "African", "sanctions").map(term => PorterStemmer.stem(term))
-    val q3 = Utils.getQueryTermsFromString("Prime (Lending) Rate Moves, Predictions")
+    val q3 = Utils.getQueryTermsFromString("South African Sanctions")
 
     //println("finding listintersection")
     //println(InvertedIndex.listIntersection(q, b))
@@ -47,7 +47,7 @@ object InvertedIndexTest {
 
     val results3 = lm.topNDocs(q3, 100)
     //println(results1.toString)
-    val scores1 = ScoringUtils.getScoresFromResults(56, results3)
+    val scores1 = ScoringUtils.getScoresFromResults(52, results3)
     println(scores1.precision)
     println(scores1.recall)
     println(scores1.f1)
