@@ -10,8 +10,7 @@ class LanguageModelTest {
     "is" -> List(new DocData("0", 1), new DocData("1", 1), new DocData("2", 1)))
   val docLength : Map[String,Int] = Map("0" -> 4, "1" -> 6, "2" -> 4)
 
-  val lambda = 0.01
-  val lm: LanguageModel = new LanguageModel(index, docLength, lambda)
+  val lm: LanguageModel = new LanguageModel(index, docLength)
   val query = List("house", "is", "red")
 
 
@@ -29,9 +28,9 @@ class LanguageModelTest {
 
   @Test
   def testFindLogPQDSmoothSmall(): Unit = {
-    val doc0 = lm.findLogPQDSmooth(query, "0", lambda)
-    val doc1 = lm.findLogPQDSmooth(query, "1", lambda)
-    val doc2 = lm.findLogPQDSmooth(query, "2", lambda)
+    val doc0 = lm.findLogPQDSmooth(query, "0")
+    val doc1 = lm.findLogPQDSmooth(query, "1")
+    val doc2 = lm.findLogPQDSmooth(query, "2")
     assertTrue(doc1 > doc2 && doc2 > doc0)
   }
 }

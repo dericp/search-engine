@@ -24,7 +24,7 @@ object LanguageModelValidationScores {
       val lambda = StdIn.readDouble()
       println("running with lambda value " + lambda)
 
-      val lm = new LanguageModel(invIdx, docLengths, lambda)
+      val lm = new LanguageModel(invIdx, docLengths)
 
       val queryNumToScores = ScoringUtils.computeAllScores(lm)
       val meanAvgPrec = ScoringUtils.meanAvgPrec(queryNumToScores.values.toSeq)
