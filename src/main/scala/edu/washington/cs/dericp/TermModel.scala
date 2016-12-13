@@ -26,7 +26,6 @@ class TermModel(val index: Map[String,Seq[DocData]], val docLength: Map[String,I
   def topNDocs(query: Seq[String], n: Int): Seq[String] = {
     val trimmedIndex = InvertedIndex.listIntersection(query, n, index)
     var shortenedDocList = docLength.keys
-    println(trimmedIndex.size)
     if (!trimmedIndex.isEmpty) {
       shortenedDocList = shortenedDocList.filter(d => trimmedIndex.contains(d))
     }

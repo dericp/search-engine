@@ -40,6 +40,7 @@ object ScoringUtils {
   def f1Score(truePos: Int, falsePos: Int, falseNeg: Int): Double = {
     val p = precision(truePos, falsePos)
     val r = recall(truePos, falseNeg)
+    if (p + r == 0) { return 0.0 }
     2 * p * r / (p + r)
   }
 
