@@ -1,4 +1,5 @@
-Retrieval System
-Deric Pang, Erika Wolfe, Isabella Jimenez
-
-Make sure to download documents.zip and put it in src/main/resources/.
+Download the 100k newswire documents as documents.zip and put it in src/main/resources/documents/.
+Execute "sbt run" on the command line. Run the main method at edu.washington.cs.dericp.Main. Follow
+the instructions in main to run the test queries. Building an inverted index from scratch takes a
+significant amount of memory, but once an inverted index has been built, it is possible to write it
+to disk and simply load the inverted index during subsequent runs.
