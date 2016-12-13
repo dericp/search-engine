@@ -1,7 +1,4 @@
-test lambda values - change lambda value based on doc length?
 combine LanguageModelValidationScores and TermModelValidationScores
-define lambda in the language model
-add nice comments in TermModel
 
 write up
 run streaming stuff?
