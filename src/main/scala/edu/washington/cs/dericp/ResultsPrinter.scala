@@ -56,8 +56,8 @@ object ResultsPrinter {
     * @param args
     */
   def main(args: Array[String]): Unit = {
-    val queries = getTestQueries().take(1)
-    val useLangModel = true
+    val queries = getTestQueries()
+    val useLangModel = false
 
     val invIndex = InvertedIndex.readInvertedIndexFromFile(INV_IDX_FILEPATH)
 
