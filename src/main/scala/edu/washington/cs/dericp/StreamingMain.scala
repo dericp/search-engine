@@ -40,7 +40,7 @@ object StreamingMain {
 
 
       val logPQDs = docsToTerms.keys.map(doc => (doc, query.map(q => log(findPWD(docsToTF(doc)(q), docsToLength(doc)))).sum)).toSeq
-      val results = logPQDs.sortBy(_._2).take(n)
+      val results = logPQDs.sortBy(-_._2).take(n)
 
       println(results.mkString(", "))
 
