@@ -5,7 +5,7 @@ import java.io.PrintStream
 import ch.ethz.dal.tinyir.io.TipsterStream
 
 import scala.collection.immutable.ListMap
-import scala.io.Source
+import scala.io.{Source, StdIn}
 
 /**
   * Created by Isa on 12/12/2016.
@@ -58,8 +58,9 @@ object ResultsPrinter {
     */
   def main(args: Array[String]): Unit = {
     val queries = ListMap(getTestQueries().toSeq.sortBy(_._1):_*)
-    println(queries)
-    val useLangModel = true
+    println("Use language model or term model?  (LANG / TERM)")
+
+    val modelType = StdIn.readLine()
 
     val invIndex = InvertedIndex.readInvertedIndexFromFile(INV_IDX_FILEPATH)
 
@@ -68,16 +69,18 @@ object ResultsPrinter {
 
     val lambda = .01
 
-    if (useLangModel) {
+    if (modelType.equalsIgnoreCase("LANG")) {
       val lm = new LanguageModel(invIndex, docLengths, lambda)
       val results = ScoringUtils.getRelevanceModelResults(lm, queries).mapValues(_.zipWithIndex)
       val ps = new PrintStream("ranking-l-13.run" + CUSTOM_RUN_TAG)
       printResults(results, ps)
-    } else {
+    } else if (modelType.equalsIgnoreCase("TERM")) {
       val tm = new TermModel(invIndex, docLengths)
       val results = ScoringUtils.getRelevanceModelResults(tm, queries).mapValues(_.zipWithIndex)
       val ps = new PrintStream("ranking-t-13.run" + CUSTOM_RUN_TAG)
       printResults(results, ps)
+    } else {
+      throw new IllegalArgumentException("Invalid relevance model name. Please enter one of the options.")
     }
 
   }
