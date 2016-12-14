@@ -1,6 +1,5 @@
 package edu.washington.cs.dericp
 
-import ch.ethz.dal.tinyir.processing.XMLDocument
 import com.github.aztek.porterstemmer.PorterStemmer
 
 import scala.io.Source

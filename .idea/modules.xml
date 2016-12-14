@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/retrieval-system.iml" filepath="$PROJECT_DIR$/.idea/modules/retrieval-system.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/retrieval-system-build.iml" filepath="$PROJECT_DIR$/.idea/modules/retrieval-system-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/search-engine.iml" filepath="$PROJECT_DIR$/.idea/modules/search-engine.iml" />
     </modules>
   </component>
 </project>
